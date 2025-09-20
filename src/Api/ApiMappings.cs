@@ -28,10 +28,11 @@ public static class ApiMappings
 
     public static WebApplication MapConversationApi(this WebApplication app)
     {
-        app.MapGet(ApiConversationPath, async (IConversationQuery conversationQuery) => Results.Ok(await conversationQuery.GetAllConversationsAsync()));
+        app.MapGet(ApiConversationPath, 
+            async (IConversationQuery conversationQuery, HttpContext context) => Results.Ok(await conversationQuery.GetAllConversationsAsync(context.User.Id())));
 
         app.MapGet(ApiConversationById, 
-            async (Guid conversationId, IConversationQuery conversationQuery) => Results.Ok(await conversationQuery.LoadAsync(conversationId)));
+            async (Guid conversationId, IConversationQuery conversationQuery, HttpContext context) => Results.Ok(await conversationQuery.LoadAsync(context.User.Id(), conversationId)));
 
         app.MapPost(ApiConversationPath, 
             async (IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new CreateConversationCommand(context.User.Id()))));

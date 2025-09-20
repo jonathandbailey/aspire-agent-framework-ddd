@@ -10,7 +10,7 @@ public class CreateConversationCommandHandler(IConversationRepository conversati
     {
         var conversation = new Conversation(request.UserId);
 
-        await conversationHistory.SaveAsync(conversation.Id, conversation);
+        await conversationHistory.SaveAsync(conversation);
 
         return conversation;
     }

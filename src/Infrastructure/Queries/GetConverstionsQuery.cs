@@ -19,12 +19,14 @@ public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorag
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public async Task<List<Conversation>> GetAllConversationsAsync()
+    public async Task<List<Conversation>> GetAllConversationsAsync(Guid userId)
     {
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(BlobContainerName);
         var conversations = new List<Conversation>();
 
-        await foreach (var blobItem in blobContainerClient.GetBlobsAsync())
+        var prefix = $"user-{userId}/conversations/";
+
+        await foreach (var blobItem in blobContainerClient.GetBlobsAsync(prefix : prefix))
         {
             try
             {
@@ -47,17 +49,15 @@ public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorag
         return conversations;
     }
 
-    public async Task<Conversation> LoadAsync(Guid conversationId)
+    public async Task<Conversation> LoadAsync(Guid userId, Guid conversationId)
     {
         Verify.NotEmpty(conversationId);
-
-        var blobContainerClient = blobServiceClient.GetBlobContainerClient(BlobContainerName);
-        var blobClient = blobContainerClient.GetBlobClient(GetBlobName(conversationId));
-
+        Verify.NotEmpty(userId);
+      
         try
         {
             var serializeChatHistory =
-                await storageRepository.DownloadTextBlobAsync(GetBlobName(conversationId), BlobContainerName);
+                await storageRepository.DownloadTextBlobAsync(GetFullBlobName(userId, conversationId), BlobContainerName);
 
             var conversation = JsonSerializer.Deserialize<Conversation>(serializeChatHistory, SerializerOptions);
 
@@ -77,8 +77,8 @@ public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorag
         }
     }
 
-    private static string GetBlobName(Guid threadId)
+    private static string GetFullBlobName(Guid userId, Guid conversationId)
     {
-        return $"{threadId}.json";
+        return $"user-{userId}/conversations/conversation-{conversationId}.json";
     }
 }

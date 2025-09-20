@@ -13,7 +13,7 @@ public class AssistantMessageAddedHandler(IConversationRepository conversationRe
 {
     public async Task Handle(AssistantMessageAddedEvent request, CancellationToken cancellationToken)
     {
-        var conversation = await conversationRepository.LoadAsync(request.ConversationId);
+        var conversation = await conversationRepository.LoadAsync(request.UserId, request.ConversationId);
 
         if (string.IsNullOrWhiteSpace(conversation.Name))
         {
@@ -51,7 +51,7 @@ public class AssistantMessageAddedHandler(IConversationRepository conversationRe
                 }
             }
 
-            await conversationRepository.SaveAsync(conversation.Id, conversation);
+            await conversationRepository.SaveAsync(conversation);
 
             await mediator.PublishDomainEvents(conversation);
         }

@@ -24,7 +24,7 @@ public class ChatCommandHandler(IConversationRepository conversationRepository,
 
         try
         {
-            var conversation = await conversationRepository.LoadAsync(conversationId);
+            var conversation = await conversationRepository.LoadAsync(userId, conversationId);
 
             conversation.AddUserMessage(new UserMessage(id, message));
 
@@ -34,7 +34,7 @@ public class ChatCommandHandler(IConversationRepository conversationRepository,
       
             conversation.AddAssistantMessage(assistantMessage, userId);
 
-            await conversationRepository.SaveAsync(conversationId, conversation);
+            await conversationRepository.SaveAsync(conversation);
 
             await mediator.PublishDomainEvents(conversation);
 

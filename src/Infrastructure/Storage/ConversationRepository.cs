@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Interfaces;
-using Azure.Storage.Blobs;
 using Domain.Conversations;
 using Infrastructure.Dto;
 using Infrastructure.Extensions;
@@ -10,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Storage;
 
-public class ConversationRepository(BlobServiceClient blobServiceClient, IAzureStorageRepository storageRepository, ILogger<ConversationRepository> logger) : IConversationRepository
+public class ConversationRepository(IAzureStorageRepository storageRepository, ILogger<ConversationRepository> logger) : IConversationRepository
 {
     private const string BlobContainerName = "user-conversation-history";
     private const string ApplicationJsonContentType = "application/json";
@@ -23,7 +22,7 @@ public class ConversationRepository(BlobServiceClient blobServiceClient, IAzureS
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public async Task SaveAsync(Guid conversationId, Conversation conversation)
+    public async Task SaveAsync(Conversation conversation)
     {
         Verify.NotNull(conversation);
 
@@ -31,51 +30,23 @@ public class ConversationRepository(BlobServiceClient blobServiceClient, IAzureS
         {
             var serializedConversation = JsonSerializer.Serialize(conversation.Map(), SerializerOptions);
 
-            await storageRepository.UploadTextBlobAsync(GetBlobName(conversationId), BlobContainerName, serializedConversation, ApplicationJsonContentType);
+            await storageRepository.UploadTextBlobAsync(GetFullBlobName(conversation.UserId, conversation.Id), BlobContainerName, serializedConversation, ApplicationJsonContentType);
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "An exception has occurred while trying to Save the Agent Chat History , {threadId}", conversationId);
+            logger.LogError(exception, "An exception has occurred while trying to Save the Agent Chat History , {Id}", conversation.Id);
             throw;
         }
     }
 
-    public async Task<List<Conversation>> GetAllConversations()
-    {
-        var blobContainerClient = blobServiceClient.GetBlobContainerClient(BlobContainerName);
-        var conversations = new List<Conversation>();
-
-        await foreach (var blobItem in blobContainerClient.GetBlobsAsync())
-        {
-            try
-            {
-                var blobName = blobItem.Name;
-                var serializedConversation = await storageRepository.DownloadTextBlobAsync(blobName, BlobContainerName);
-
-                var conversation = JsonSerializer.Deserialize<ConversationDto>(serializedConversation, SerializerOptions);
-
-                Verify.NotNull(conversation);
-
-                conversations.Add(conversation.Map());
-            }
-            catch (Exception exception)
-            {
-                logger.LogError(exception, "Failed to load or deserialize conversation blob {blobName}", blobItem.Name);
-                throw;
-            }
-        }
-
-        return conversations;
-    }
-
-    public async Task<Conversation> LoadAsync(Guid conversationId)
+    public async Task<Conversation> LoadAsync(Guid userId, Guid conversationId)
     {
         Verify.NotNull(conversationId);
-   
+
         try
         {
             var serializeChatHistory =
-                await storageRepository.DownloadTextBlobAsync(GetBlobName(conversationId), BlobContainerName);
+                await storageRepository.DownloadTextBlobAsync(GetFullBlobName(userId, conversationId), BlobContainerName);
 
             var conversation = JsonSerializer.Deserialize<ConversationDto>(serializeChatHistory, SerializerOptions);
 
@@ -95,8 +66,8 @@ public class ConversationRepository(BlobServiceClient blobServiceClient, IAzureS
         }
     }
 
-    private static string GetBlobName(Guid threadId)
+    private static string GetFullBlobName(Guid userId, Guid conversationId)
     {
-        return $"{threadId}.json";
+        return $"user-{userId}/conversations/conversation-{conversationId}.json";
     }
 }
