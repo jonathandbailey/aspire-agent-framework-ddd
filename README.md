@@ -20,7 +20,12 @@ I would recommend downloading Microsoft Azure Storage Explorer to manage the loc
 - Create 2 Blob containers : agent-templates & user-conversation-history
 - Add the semantice kernel templates (in the assets folder) to the agent-templates blob
 
-You can access the UI from the .NET Aspire dashboard and then user the application.
+### SPA
+.NET Aspire will run the SPA application when you run the App Host, but it's won't do the first time install. 
+
+After cloning the repo, run npm install in the ui folder.
+
+You can access the UI from the .NET Aspire dashboard and then use the application.
 
 
 
