@@ -1,9 +1,11 @@
 ﻿using Application.Dto;
 using Application.Interfaces;
+using Azure;
 using Azure.Storage.Blobs;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Logging;
+using Infrastructure.Exceptions;
 
 namespace Infrastructure.Queries;
 
@@ -25,27 +27,39 @@ public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorag
         var conversations = new List<Conversation>();
 
         var prefix = $"user-{userId}/conversations/";
-
-        await foreach (var blobItem in blobContainerClient.GetBlobsAsync(prefix : prefix))
+       
+        try
         {
-            try
+            await foreach (var blobItem in blobContainerClient.GetBlobsAsync(prefix: prefix))
             {
-                var blobName = blobItem.Name;
-                var serializedConversation = await storageRepository.DownloadTextBlobAsync(blobName, BlobContainerName);
 
-                var conversation = JsonSerializer.Deserialize<Conversation>(serializedConversation, SerializerOptions);
+                var blobName = blobItem.Name;
+                var serializedConversation =
+                    await storageRepository.DownloadTextBlobAsync(blobName, BlobContainerName);
+
+                var conversation =
+                    JsonSerializer.Deserialize<Conversation>(serializedConversation, SerializerOptions);
 
                 Verify.NotNull(conversation);
 
                 conversations.Add(conversation);
             }
-            catch (Exception exception)
-            {
-                logger.LogError(exception, "Failed to load or deserialize conversation blob {blobName}", blobItem.Name);
-                throw;
-            }
         }
-
+        catch (RequestFailedException exception)
+        {
+            logger.LogError(exception,
+                "Failed to load conversations for user {userId} : {ErrorCode}", userId, exception.ErrorCode);
+            
+            throw new ConversationRepositoryNotAvailableException("Conversation Data is not available.", exception);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception,
+                "Unknown Exception when loading conversations for user {userId}", userId);
+            
+            throw new InfrastructureException("Infrastructure services are not available.", exception);
+        }
+  
         return conversations;
     }
 
@@ -73,7 +87,7 @@ public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorag
         catch (Exception exception)
         {
             logger.LogError(exception, "An exception has occurred while trying to Load the Agent Chat History, {threadId}", conversationId);
-            throw;
+            throw new InfrastructureException("Infrastructure services are not available.", exception);
         }
     }
 

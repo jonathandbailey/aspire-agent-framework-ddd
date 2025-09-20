@@ -1,6 +1,7 @@
 using Api;
 using Api.Extensions;
 using Api.Hubs;
+using Api.Middleware;
 using Application.Extensions;
 using Infrastructure.Extensions;
 using ServiceDefaults;
@@ -20,6 +21,8 @@ builder.AddCorsPolicyFromServiceDiscovery();
 builder.Services.AddApiServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices();
+
+builder.Services.AddTransient<GlobalExceptionHandler>();
 
 var app = builder.Build();
 
@@ -45,5 +48,7 @@ app.UseCorsPolicyServiceDiscovery();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<GlobalExceptionHandler>();
 
 app.Run();
