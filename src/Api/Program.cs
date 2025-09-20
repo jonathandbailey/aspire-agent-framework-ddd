@@ -15,7 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//builder.AddCorsPolicyFromServiceDiscovery();
+builder.AddCorsPolicyFromServiceDiscovery();
 
 builder.Services.AddApiServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -40,7 +40,7 @@ else
 
 app.MapHub<ChatHub>("hub");
 
-//app.UseCorsPolicyServiceDiscovery();
+app.UseCorsPolicyServiceDiscovery();
 
 app.UseAuthorization();
 
