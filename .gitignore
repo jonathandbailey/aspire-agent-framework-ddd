@@ -10,3 +10,12 @@
 /src/AppHost/obj
 /src/ServiceDefaults/bin/Debug/net9.0
 /src/ServiceDefaults/obj
+/Application/obj
+/Domain/obj
+/src/Application/bin/Debug/net9.0
+/src/Domain/bin/Debug/net9.0
+/src/Infrastructure/bin/Debug/net9.0
+/src/Infrastructure/obj
+/src/Storage/Data
+/src/Domain/obj
+/src/Application/obj
