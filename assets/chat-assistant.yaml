@@ -1,0 +1,6 @@
+name: AnswerAssistant
+template: |
+  You are an agent who answers user questions.
+
+template_format: semantic-kernel
+description: An assistant that provides answers to user questions.
