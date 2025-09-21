@@ -86,8 +86,8 @@ public class Conversation : Entity
         return thread;
     }
 
-    public Message UpdateMessage(Guid assistantMessageId, string toString)
+    public Message UpdateMessage(Guid messageId, string content)
     {
-        return GetCurrentThread().UpdateAssistantMessage(assistantMessageId, toString);
+        return GetCurrentThread().UpdateAssistantMessage(messageId, content);
     }
 }

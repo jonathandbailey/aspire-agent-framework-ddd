@@ -1,16 +1,17 @@
 ﻿using System.Text;
+using Application.Dto;
 using Application.Events;
 using Application.Interfaces;
-using Domain.Conversations;
 using Infrastructure.Interfaces;
 using Microsoft.SemanticKernel.Agents;
+using Conversation = Domain.Conversations.Conversation;
 
 
 namespace Infrastructure.Assistants;
 
 public class ConversationAssistant(ChatCompletionAgent chatCompletionAgent, IAssistantMemory memory, IStreamingEventPublisher publisher) : IConversationAssistant
 {
-    public async Task GenerateResponseAsync(Conversation conversation, Guid assistantMessageId)
+    public async Task<AssistantResponseDto> GenerateResponseAsync(Conversation conversation, Guid assistantMessageId)
     {
         var thread = memory.Initialize(conversation);
 
@@ -26,6 +27,6 @@ public class ConversationAssistant(ChatCompletionAgent chatCompletionAgent, IAss
             }
         }
 
-        conversation.UpdateMessage(assistantMessageId, stringBuilder.ToString());
+        return new AssistantResponseDto {Content = stringBuilder.ToString()};
     }
 }

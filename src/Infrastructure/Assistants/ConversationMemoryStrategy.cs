@@ -1,5 +1,4 @@
-﻿using Application.Interfaces;
-using Domain.Conversations;
+﻿using Domain.Conversations;
 using Infrastructure.Interfaces;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;

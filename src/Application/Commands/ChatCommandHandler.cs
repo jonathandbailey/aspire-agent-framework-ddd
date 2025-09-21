@@ -32,7 +32,9 @@ public class ChatCommandHandler(IConversationRepository conversationRepository,
 
         var assistant = await assistantFactory.CreateConversationAssistant();
 
-        await assistant.GenerateResponseAsync(conversation, assistantMessage.Id);
+        var assistantResponseDto = await assistant.GenerateResponseAsync(conversation, assistantMessage.Id);
+
+        conversation.UpdateMessage(assistantMessage.Id, assistantResponseDto.Content);
 
         await conversationRepository.SaveAsync(conversation);
 
