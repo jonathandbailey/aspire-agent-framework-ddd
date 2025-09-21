@@ -8,19 +8,22 @@ public abstract class Message
 
     public string Content { get; private set; }
 
-    protected Message(Guid id, string content, string role)
+    public int Index { get; private set; }
+
+    protected Message(Guid id, int index, string content, string role)
     {
         Verify.NotEmpty(id);
         Verify.NotNull(content);
         Verify.NotNullOrWhiteSpace(role);
         
         Id = id;
+        Index = index;
         Content = content;
         Role = role;
     }
 
-    public void Append(string partialContent)
+    public void Update(string content)
     {
-        Content += partialContent;
+        Content = content;
     }
 }

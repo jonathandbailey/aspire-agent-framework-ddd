@@ -1,9 +1,12 @@
 ﻿namespace Domain.Conversations;
 
-public class AssistantMessage(Guid id, string content) : Message(id, content, "assistant")
+public class AssistantMessage : Message
 {
-    public static AssistantMessage Create()
+    public AssistantMessage(Guid id, int index, string content) : base(id,index, content, "assistant")
     {
-        return new AssistantMessage(Guid.NewGuid(), string.Empty);
+    }
+
+    public AssistantMessage(string content, int index) : base(Guid.NewGuid(), index, content, "assistant")
+    {
     }
 }

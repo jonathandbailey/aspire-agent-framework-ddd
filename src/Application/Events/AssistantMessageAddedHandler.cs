@@ -39,7 +39,7 @@ public class AssistantMessageAddedHandler(IConversationRepository conversationRe
                 stringBuilder.AppendLine(message.Content);
             }
 
-            var userMessage = new UserMessage(stringBuilder.ToString());
+            var userMessage = new UserMessage(stringBuilder.ToString(), 0);
 
             await foreach (var response in titleAssistant.StreamAsync(userMessage))
             {

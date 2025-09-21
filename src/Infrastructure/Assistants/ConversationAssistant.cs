@@ -10,7 +10,7 @@ namespace Infrastructure.Assistants;
 
 public class ConversationAssistant(ChatCompletionAgent chatCompletionAgent, IAssistantMemory memory, IStreamingEventPublisher publisher) : IConversationAssistant
 {
-    public async Task<AssistantMessage> GenerateResponseAsync(Conversation conversation)
+    public async Task GenerateResponseAsync(Conversation conversation, Guid assistantMessageId)
     {
         var thread = memory.Initialize(conversation);
 
@@ -26,6 +26,6 @@ public class ConversationAssistant(ChatCompletionAgent chatCompletionAgent, IAss
             }
         }
 
-        return new AssistantMessage(Guid.NewGuid(), stringBuilder.ToString());
+        conversation.UpdateMessage(assistantMessageId, stringBuilder.ToString());
     }
 }

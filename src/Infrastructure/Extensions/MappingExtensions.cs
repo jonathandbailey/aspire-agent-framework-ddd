@@ -8,17 +8,17 @@ public static class MappingExtensions
 {
     private static ConversationMessageDto Map(this Message message)
     {
-        return new ConversationMessageDto(message.Id, message.Role, message.Content);
+        return new ConversationMessageDto(message.Id, message.Index, message.Role, message.Content);
     }
 
-    private static ConversationThreadDto Map(this Domain.Conversations.ConversationThread thread)
+    private static ConversationThreadDto Map(this ConversationThread thread)
     {
         var conversationStorageMessages = thread.Messages.Select(message => message.Map()).ToList();
 
-        return new ConversationThreadDto(thread.Id, conversationStorageMessages);
+        return new ConversationThreadDto(thread.Id, thread.Index, conversationStorageMessages);
     }
 
-    public static ConversationDto Map(this Domain.Conversations.Conversation conversation)
+    public static ConversationDto Map(this Conversation conversation)
     {
         var conversationStorageThreads = conversation.Threads.Select(thread => thread.Map()).ToList();
 
@@ -29,23 +29,23 @@ public static class MappingExtensions
     {
         return messageDto.Role switch
         {
-            "assistant" => new AssistantMessage(messageDto.Id, messageDto.Content),
-            "user" => new UserMessage(messageDto.Id, messageDto.Content),
+            "assistant" => new AssistantMessage(messageDto.Id, messageDto.Index,  messageDto.Content),
+            "user" => new UserMessage(messageDto.Id, messageDto.Index, messageDto.Content),
             _ => throw new InvalidOperationException($"{messageDto.Role} is not a valid Message Type.")
         };
     }
 
-    private static Domain.Conversations.ConversationThread Map(this ConversationThreadDto threadDto)
+    private static ConversationThread Map(this ConversationThreadDto threadDto)
     {
         var messages = threadDto.Messages.Select(storageMessage => storageMessage.Map()).ToList();
 
-        return new Domain.Conversations.ConversationThread(threadDto.Id, messages);
+        return new ConversationThread(threadDto.Id, threadDto.Index, messages);
     }
 
-    public static Domain.Conversations.Conversation Map(this ConversationDto conversationDto)
+    public static Conversation Map(this ConversationDto conversationDto)
     {
         var threads = conversationDto.Threads.Select(storageThread => storageThread.Map()).ToList();
 
-        return new Domain.Conversations.Conversation(conversationDto.Id,conversationDto.UserId, conversationDto.Name, conversationDto.CurrentThread, threads);
+        return new Conversation(conversationDto.Id,conversationDto.UserId, conversationDto.Name, conversationDto.CurrentThread, threads);
     }
 }

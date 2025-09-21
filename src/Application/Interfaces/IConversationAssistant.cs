@@ -4,5 +4,5 @@ namespace Application.Interfaces;
 
 public interface IConversationAssistant
 {
-    Task<AssistantMessage>  GenerateResponseAsync(Conversation conversation);
+    Task GenerateResponseAsync(Conversation conversation, Guid assistantMessageId);
 }

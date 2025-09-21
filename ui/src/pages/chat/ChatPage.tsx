@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ChatService } from "../../services/chat/chat.service";
 import ChatInput from "../../components/chat/ChatInput";
 
@@ -22,21 +23,20 @@ const ChatPage = () => {
 
     const conversationService = new ConversationService();
 
+    const { data: conversation } = useQuery({
+        queryKey: ["conversation", conversationId],
+        queryFn: () => conversationService.LoadConversation(conversationId),
+        enabled: !!conversationId,
+    });
 
     useEffect(() => {
-        const initializeConversation = async () => {
-            const conversation = await conversationService.LoadConversation(conversationId);
-
+        if (conversation) {
             const allMessages = conversation.threads.flatMap(thread =>
-                thread.messages.map(msg => (UIMessageFactory.createMessage(msg)))
+                thread.messages.map(msg => UIMessageFactory.createMessage(msg))
             );
-
             setMessages(allMessages);
-
-        };
-
-        initializeConversation();
-    }, [conversationId]);
+        }
+    }, [conversation]);
 
     streamingService.on("chat", (response: ChatResponseDto) => {
 

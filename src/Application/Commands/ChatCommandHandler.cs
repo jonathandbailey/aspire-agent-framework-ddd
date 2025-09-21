@@ -3,14 +3,12 @@ using Application.Interfaces;
 using Domain;
 using Domain.Conversations;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace Application.Commands;
 
 public class ChatCommandHandler(IConversationRepository conversationRepository,
     IMediator mediator,
-    IAssistantFactory assistantFactory,
-    ILogger<ChatCommandHandler> logger) : IRequestHandler<ChatCommand, AssistantMessage>
+    IAssistantFactory assistantFactory) : IRequestHandler<ChatCommand, AssistantMessage>
 {
     public async Task<AssistantMessage> Handle(ChatCommand request, CancellationToken cancellationToken)
     {
@@ -21,32 +19,25 @@ public class ChatCommandHandler(IConversationRepository conversationRepository,
     {
         Verify.NotEmpty(userId);
         Verify.NotEmpty(conversationId);
+       
+        var conversation = await conversationRepository.LoadAsync(userId, conversationId);
 
-        try
-        {
-            var conversation = await conversationRepository.LoadAsync(userId, conversationId);
+        conversation.AddUserMessage(message);
 
-            conversation.AddUserMessage(new UserMessage(id, message));
+        var assistantMessage = conversation.AddAssistantMessage();
 
-            var assistant = await assistantFactory.CreateConversationAssistant();
+        await conversationRepository.SaveAsync(conversation);
 
-            var assistantMessage = await assistant.GenerateResponseAsync(conversation);
-      
-            conversation.AddAssistantMessage(assistantMessage, userId);
+        await mediator.PublishDomainEvents(conversation);
 
-            await conversationRepository.SaveAsync(conversation);
+        var assistant = await assistantFactory.CreateConversationAssistant();
 
-            await mediator.PublishDomainEvents(conversation);
+        await assistant.GenerateResponseAsync(conversation, assistantMessage.Id);
 
-            return assistantMessage;
-        }
-        catch (Exception exception)
-        {
-            var chatException = new ChatException("An exception has occurred while trying to execute chat", userId, conversationId, exception);
+        await conversationRepository.SaveAsync(conversation);
 
-            logger.LogError(chatException, "Failed to execute chat {UserId}, {ConversationId}", userId, conversationId);
+        await mediator.PublishDomainEvents(conversation);
 
-            throw chatException;
-        }
+        return assistantMessage;
     }
 }

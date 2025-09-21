@@ -33,7 +33,7 @@ public class Conversation : Entity
 
     private void CreateNewThread()
     {
-        var conversationThread = new ConversationThread();
+        var conversationThread = new ConversationThread(_threads.Count);
 
         _threads.Add(conversationThread);
 
@@ -47,9 +47,18 @@ public class Conversation : Entity
         AddDomainEvent(new ConversationTitleUpdatedEvent(userId,Id, Name));
     }
 
-    public void AddUserMessage(UserMessage message)
+    public void AddUserMessage(string content)
     {
-        ValidateAndAddMessageToThread(message);
+        Verify.NotNullOrWhiteSpace(content);
+        
+        var currentThread = GetCurrentThread();        
+        
+        currentThread.AddUserMessage(content);
+    }
+
+    public AssistantMessage AddAssistantMessage()
+    {
+        return GetCurrentThread().AddAssistantMessage(string.Empty);
     }
 
     public void AddAssistantMessage(AssistantMessage message, Guid userId)
@@ -64,9 +73,21 @@ public class Conversation : Entity
         Verify.NotNull(message);
         Verify.NotEmpty(CurrentThread);
 
+        var thread = GetCurrentThread();
+
+        thread.AddMessage(message);
+    }
+
+    private ConversationThread GetCurrentThread()
+    {
         var thread = Threads.FirstOrDefault(x => x.Id == CurrentThread)
                      ?? throw new ArgumentException($"Thread {CurrentThread} does not exist in conversation {Id} ");
 
-        thread.AddMessage(message);
+        return thread;
+    }
+
+    public Message UpdateMessage(Guid assistantMessageId, string toString)
+    {
+        return GetCurrentThread().UpdateAssistantMessage(assistantMessageId, toString);
     }
 }
