@@ -81,8 +81,8 @@ public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorag
         }
         catch (JsonException jsonEx)
         {
-            logger.LogError(jsonEx, "Failed to deserialize chat history for thread {threadId}", conversationId);
-            throw;
+            logger.LogError(jsonEx, "Failed to deserialize conversation {conversationId} for user {userId}", conversationId, userId);
+            throw new ConversationInfrastructureException("There is an issue processing this conversation.", jsonEx);
         }
         catch (Exception exception)
         {
