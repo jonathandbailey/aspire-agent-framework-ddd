@@ -5,3 +5,5 @@ public sealed record Conversation(Guid Id, string Name, Guid CurrentThread, List
 public sealed record ConversationThread(Guid Id, List<ConversationMessage> Messages);
 
 public sealed record ConversationMessage(Guid Id, string Role, string Content);
+
+public sealed record ConversationSummaryItem(Guid Id, string Title);

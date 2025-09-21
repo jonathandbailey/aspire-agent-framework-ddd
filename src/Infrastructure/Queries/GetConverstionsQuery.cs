@@ -21,6 +21,13 @@ public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorag
         Converters = { new JsonStringEnumConverter() }
     };
 
+    public async Task<List<ConversationSummaryItem>> GetConversationSummaries(Guid userId)
+    {
+        var conversations = await GetAllConversationsAsync(userId);
+
+        return conversations.Select(conversation => new ConversationSummaryItem(conversation.Id, conversation.Name)).ToList();
+    }
+
     public async Task<List<Conversation>> GetAllConversationsAsync(Guid userId)
     {
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(BlobContainerName);
@@ -32,7 +39,6 @@ public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorag
         {
             await foreach (var blobItem in blobContainerClient.GetBlobsAsync(prefix: prefix))
             {
-
                 var blobName = blobItem.Name;
                 var serializedConversation =
                     await storageRepository.DownloadTextBlobAsync(blobName, BlobContainerName);

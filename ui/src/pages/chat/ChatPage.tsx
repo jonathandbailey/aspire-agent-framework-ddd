@@ -9,14 +9,10 @@ import { UIMessageFactory } from "../../factories/UIMessageFactory";
 import { ConversationService } from "../../services/chat/conversation.service";
 import { useParams } from "react-router-dom";
 import ChatConversation from "../../components/chat/ChatConversation";
-import { Typography } from "antd";
-
-const { Title } = Typography;
 
 const ChatPage = () => {
     const [messages, setMessages] = useState<UIMessage[]>([]);
     const [responseMessage, setResponseMessage] = useState<UIMessage | null>(null);
-    const [title, setTitle] = useState<string>("");
     const { id } = useParams();
 
     if (!id) throw new Error("Conversation id is required");
@@ -36,7 +32,7 @@ const ChatPage = () => {
             );
 
             setMessages(allMessages);
-            setTitle(conversation.name);
+
         };
 
         initializeConversation();

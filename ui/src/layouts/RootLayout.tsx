@@ -20,17 +20,15 @@ const RootLayout = () => {
         error
     } = useQuery<Conversation[]>({
         queryKey: ["conversations"],
-        queryFn: () => conversationService.LoadConversations(),
+        queryFn: () => conversationService.LoadConversationSummaries(),
         retry: false,
     });
     const navigate = useNavigate();
 
-    // Mutation for creating a conversation
     const { mutate: createConversation } = useMutation({
         mutationFn: () => conversationService.CreateConversation(),
         onSuccess: (newConversation: Conversation) => {
             navigate(`/conversation/${newConversation.id}`);
-            // Optionally, invalidate or refetch conversations query here
         }
     });
 
@@ -39,9 +37,6 @@ const RootLayout = () => {
         createConversation();
     };
 
-    // Conversations are loaded by React Query
-
-    // If you need to update the UI when a conversation title changes, consider using a query invalidation or refetch
     streamingService.on("command", ({ conversationId, title }) => {
         queryClient.setQueryData(["conversations"], (oldConversations: Conversation[] = []) =>
             oldConversations.map(convo =>

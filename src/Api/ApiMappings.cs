@@ -10,9 +10,10 @@ namespace Api;
 
 public static class ApiMappings
 {
-    private const string ApiConversationPath = "api/conversation";
+    private const string ApiConversationPath = "api/conversations";
+    private const string ApiConversationSummariesPath = "api/conversations/summaries";
     private const string ApiChatPath = "api/chat";
-    private const string ApiConversationById = "api/conversation/{conversationId:guid}";
+    private const string ApiConversationById = "api/conversations/{conversationId:guid}";
 
     public static WebApplication MapChatApi(this WebApplication app)
     {
@@ -30,6 +31,10 @@ public static class ApiMappings
     {
         app.MapGet(ApiConversationPath, 
             async (IConversationQuery conversationQuery, HttpContext context) => Results.Ok(await conversationQuery.GetAllConversationsAsync(context.User.Id())));
+
+        app.MapGet(ApiConversationSummariesPath,
+            async (IConversationQuery conversationQuery, HttpContext context) => Results.Ok(await conversationQuery.GetConversationSummaries(context.User.Id())));
+
 
         app.MapGet(ApiConversationById, 
             async (Guid conversationId, IConversationQuery conversationQuery, HttpContext context) => Results.Ok(await conversationQuery.LoadAsync(context.User.Id(), conversationId)));
