@@ -19,9 +19,9 @@ public static class ApiMappings
     {
         app.MapPost(ApiChatPath, async ([FromBody] ChatRequestDto requestDto, IMediator mediator, HttpContext context) =>
         {
-            var message = await mediator.Send(requestDto.Map(context.User.Id()));
+            await mediator.Send(requestDto.Map(context.User.Id()));
  
-            return Results.Ok(message.MapToChatResponseDto(requestDto.ConversationId));
+            return Results.Ok();
         });
         
         return app;

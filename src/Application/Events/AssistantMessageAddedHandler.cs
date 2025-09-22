@@ -26,20 +26,9 @@ public class AssistantMessageAddedHandler(IConversationRepository conversationRe
                 throw new InvalidOperationException($"Conversation {conversation.Id} doesn't have any threads");
             }
 
-            if (firstThread.Messages.Count == 0)
-            {
-                throw new InvalidOperationException(
-                    $"Thread {firstThread.Id} doesn't have any messages. (Conversation : {conversation.Id})");
-            }
+            
 
-            var stringBuilder = new StringBuilder();
-
-            foreach (var message in firstThread.Messages)
-            {
-                stringBuilder.AppendLine(message.Content);
-            }
-
-            var userMessage = new UserMessage(stringBuilder.ToString(), 0);
+            var userMessage = new UserMessage(string.Empty, 0);
 
             await foreach (var response in titleAssistant.StreamAsync(userMessage))
             {

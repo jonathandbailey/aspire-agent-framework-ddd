@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Application.Commands;
 
-public sealed record ChatCommand(Guid Id, string Message, Guid UserId, Guid ConversationId) : IRequest<AssistantMessage>;
+public sealed record ChatCommand(Guid Id, string Message, Guid UserId, Guid ConversationId) : IRequest;

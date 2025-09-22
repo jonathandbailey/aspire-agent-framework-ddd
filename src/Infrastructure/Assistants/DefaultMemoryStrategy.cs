@@ -1,5 +1,4 @@
-﻿using Application.Interfaces;
-using Domain.Conversations;
+﻿using Domain.Conversations;
 using Infrastructure.Interfaces;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
@@ -14,21 +13,14 @@ public class DefaultMemoryStrategy : IAssistantMemory
       
         var agentThread = new ChatHistoryAgentThread();
 
-        foreach (var conversationThreadMessage in conversation.Threads.SelectMany(conversationThread => conversationThread.Messages))
+        foreach (var thread in conversation.Threads)
         {
-            switch (conversationThreadMessage.Role)
+            foreach (var turn in thread.Turns)
             {
-                case "user":
-                    agentThread.ChatHistory.Add(new ChatMessageContent(AuthorRole.User, conversationThreadMessage.Content));
-                    break;
-                case "assistant":
-                    agentThread.ChatHistory.Add(new ChatMessageContent(AuthorRole.Assistant, conversationThreadMessage.Content));
-                    break;
-                default:
-                    throw new InvalidOperationException($"Unexpected role '{conversationThreadMessage.Role}' in conversation thread message.");
+                agentThread.ChatHistory.Add(new ChatMessageContent(AuthorRole.User, turn.UserMessage.Content));
+                agentThread.ChatHistory.Add(new ChatMessageContent(AuthorRole.Assistant, turn.AssistantMessage.Content));
             }
         }
-        
 
         return agentThread;
     }

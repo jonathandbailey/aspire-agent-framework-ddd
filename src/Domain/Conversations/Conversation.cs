@@ -31,6 +31,20 @@ public class Conversation : Entity
         _threads = threads;
     }
 
+    public void StartConversationTurn(string content)
+    {
+        var thread = GetCurrentThread();
+
+        thread.StartConversationTurn(content);
+    }
+
+    public void EndConversationTurn(string content)
+    {
+        var thread = GetCurrentThread();
+
+        thread.EndConversationTurn(content);
+    }
+
     private void CreateNewThread()
     {
         var conversationThread = new ConversationThread(_threads.Count);
@@ -47,47 +61,11 @@ public class Conversation : Entity
         AddDomainEvent(new ConversationTitleUpdatedEvent(userId,Id, Name));
     }
 
-    public void AddUserMessage(string content)
-    {
-        Verify.NotNullOrWhiteSpace(content);
-        
-        var currentThread = GetCurrentThread();        
-        
-        currentThread.AddUserMessage(content);
-    }
-
-    public AssistantMessage AddAssistantMessage()
-    {
-        return GetCurrentThread().AddAssistantMessage(string.Empty);
-    }
-
-    public void AddAssistantMessage(AssistantMessage message, Guid userId)
-    {
-        ValidateAndAddMessageToThread(message);
-
-        AddDomainEvent(new AssistantMessageAddedEvent(message, Id, userId));
-    }
-
-    private void ValidateAndAddMessageToThread(Message message)
-    {
-        Verify.NotNull(message);
-        Verify.NotEmpty(CurrentThread);
-
-        var thread = GetCurrentThread();
-
-        thread.AddMessage(message);
-    }
-
     private ConversationThread GetCurrentThread()
     {
         var thread = Threads.FirstOrDefault(x => x.Id == CurrentThread)
                      ?? throw new ArgumentException($"Thread {CurrentThread} does not exist in conversation {Id} ");
 
         return thread;
-    }
-
-    public Message UpdateMessage(Guid messageId, string content)
-    {
-        return GetCurrentThread().UpdateAssistantMessage(messageId, content);
     }
 }

@@ -11,7 +11,7 @@ namespace Infrastructure.Assistants;
 
 public class ConversationAssistant(ChatCompletionAgent chatCompletionAgent, IAssistantMemory memory, IStreamingEventPublisher publisher) : IConversationAssistant
 {
-    public async Task<AssistantResponseDto> GenerateResponseAsync(Conversation conversation, Guid assistantMessageId)
+    public async Task<AssistantResponseDto> GenerateResponseAsync(Conversation conversation)
     {
         var thread = memory.Initialize(conversation);
 

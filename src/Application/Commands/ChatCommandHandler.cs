@@ -1,30 +1,27 @@
 ﻿using Application.Extensions;
 using Application.Interfaces;
 using Domain;
-using Domain.Conversations;
 using MediatR;
 
 namespace Application.Commands;
 
 public class ChatCommandHandler(IConversationRepository conversationRepository,
     IMediator mediator,
-    IAssistantFactory assistantFactory) : IRequestHandler<ChatCommand, AssistantMessage>
+    IAssistantFactory assistantFactory) : IRequestHandler<ChatCommand>
 {
-    public async Task<AssistantMessage> Handle(ChatCommand request, CancellationToken cancellationToken)
+    public async Task Handle(ChatCommand request, CancellationToken cancellationToken)
     {
-        return await Chat( request.Id, request.Message, request.UserId, request.ConversationId);
+        await Chat( request.Id, request.Message, request.UserId, request.ConversationId);
     }
 
-    private async Task<AssistantMessage> Chat(Guid id, string message, Guid userId, Guid conversationId)
+    private async Task Chat(Guid id, string message, Guid userId, Guid conversationId)
     {
         Verify.NotEmpty(userId);
         Verify.NotEmpty(conversationId);
        
         var conversation = await conversationRepository.LoadAsync(userId, conversationId);
 
-        conversation.AddUserMessage(message);
-
-        var assistantMessage = conversation.AddAssistantMessage();
+        conversation.StartConversationTurn(message);
 
         await conversationRepository.SaveAsync(conversation);
 
@@ -32,14 +29,13 @@ public class ChatCommandHandler(IConversationRepository conversationRepository,
 
         var assistant = await assistantFactory.CreateConversationAssistant();
 
-        var assistantResponseDto = await assistant.GenerateResponseAsync(conversation, assistantMessage.Id);
+        var assistantResponseDto = await assistant.GenerateResponseAsync(conversation);
 
-        conversation.UpdateMessage(assistantMessage.Id, assistantResponseDto.Content);
-
+        conversation.EndConversationTurn(assistantResponseDto.Content);
+  
         await conversationRepository.SaveAsync(conversation);
 
         await mediator.PublishDomainEvents(conversation);
 
-        return assistantMessage;
     }
 }

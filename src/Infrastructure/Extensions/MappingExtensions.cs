@@ -11,11 +11,22 @@ public static class MappingExtensions
         return new ConversationMessageDto(message.Id, message.Index, message.Role, message.Content);
     }
 
+
+    private static ConversationTurnDto Map(this ConversationTurn turn)
+    {
+        return new ConversationTurnDto(turn.Id, turn.Index, turn.UserMessage.Map(), turn.AssistantMessage.Map());
+    }
+
+    private static ConversationTurn Map(this ConversationTurnDto turnDto)
+    {
+        return new ConversationTurn(turnDto.Id, turnDto.Index, turnDto.UserMessage.MapUserMessage(), turnDto.AssistantMessage.MapAssistantMessage());
+    }
+
     private static ConversationThreadDto Map(this ConversationThread thread)
     {
-        var conversationStorageMessages = thread.Messages.Select(message => message.Map()).ToList();
+        var turns = thread.Turns.Select(turn => turn.Map()).ToList();
 
-        return new ConversationThreadDto(thread.Id, thread.Index, conversationStorageMessages);
+        return new ConversationThreadDto(thread.Id, thread.Index, turns);
     }
 
     public static ConversationDto Map(this Conversation conversation)
@@ -25,11 +36,23 @@ public static class MappingExtensions
         return new ConversationDto(conversation.Id, conversation.UserId, conversation.Name, conversation.CurrentThread,
             conversationStorageThreads);
     }
-    private static Message Map(this ConversationMessageDto messageDto)
+   
+    private static AssistantMessage MapAssistantMessage(this ConversationMessageDto messageDto)
     {
         return messageDto.Role switch
         {
-            "assistant" => new AssistantMessage(messageDto.Id, messageDto.Index,  messageDto.Content),
+
+            "assistant" => new AssistantMessage(messageDto.Id, messageDto.Index, messageDto.Content),
+            _ => throw new InvalidOperationException($"{messageDto.Role} is not a valid Message Type.")
+        };
+    }
+
+
+    private static UserMessage MapUserMessage(this ConversationMessageDto messageDto)
+    {
+        return messageDto.Role switch
+        {
+           
             "user" => new UserMessage(messageDto.Id, messageDto.Index, messageDto.Content),
             _ => throw new InvalidOperationException($"{messageDto.Role} is not a valid Message Type.")
         };
@@ -37,9 +60,9 @@ public static class MappingExtensions
 
     private static ConversationThread Map(this ConversationThreadDto threadDto)
     {
-        var messages = threadDto.Messages.Select(storageMessage => storageMessage.Map()).ToList();
+        var turns = threadDto.Turns.Select(turn => turn.Map()).ToList();
 
-        return new ConversationThread(threadDto.Id, threadDto.Index, messages);
+        return new ConversationThread(threadDto.Id, threadDto.Index, turns);
     }
 
     public static Conversation Map(this ConversationDto conversationDto)

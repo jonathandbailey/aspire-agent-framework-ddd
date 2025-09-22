@@ -2,11 +2,10 @@
 
 public class ConversationThread : Entity
 {
-    private readonly List<Message> _messages = [];
-
+    private readonly List<ConversationTurn> _turns = [];
     public int Index { get; private set; }
 
-    public IReadOnlyCollection<Message> Messages => _messages;
+    public IReadOnlyCollection<ConversationTurn> Turns => _turns;
 
     public ConversationThread(int index)
     {
@@ -14,44 +13,22 @@ public class ConversationThread : Entity
         Index = index;
     }
 
-    public ConversationThread(Guid id, int index, List<Message> messages)
+    public ConversationThread(Guid id, int index, List<ConversationTurn> turns)
     {
         Id = id;
-        _messages = messages;
         Index = index;
+        _turns = turns;
     }
 
-    public void AddMessage(Message message)
+    public void StartConversationTurn(string content)
     {
-        _messages.Add(message);
+        _turns.Add(new ConversationTurn(Guid.NewGuid(), _turns.Count,  new UserMessage(content, 0), new AssistantMessage(string.Empty, 1)));
     }
 
-    public void AddUserMessage(string content)
+    public void EndConversationTurn(string content)
     {
-        Verify.NotNullOrWhiteSpace(content);
+        var turn = _turns.Last();
 
-        _messages.Add(new UserMessage(content, _messages.Count));
-    }
-
-    public AssistantMessage AddAssistantMessage(string content)
-    {
-        var message = new AssistantMessage(content, _messages.Count);
-
-
-        _messages.Add(message);
-
-        return message;
-    }
-
-    public Message UpdateAssistantMessage(Guid messageId, string content)
-    {
-        var message = _messages.FirstOrDefault(x => x.Id == messageId);
-
-        if (message == null)
-            throw new Exception($"Conversation Thread ({Id} does not contain a message with id ({messageId}");
-
-        message.Update(content);
-
-        return message;
+        turn.AssistantMessage.Update(content);
     }
 }
