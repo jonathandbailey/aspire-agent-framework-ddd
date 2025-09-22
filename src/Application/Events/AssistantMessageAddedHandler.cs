@@ -19,22 +19,9 @@ public class AssistantMessageAddedHandler(IConversationRepository conversationRe
         {
             var titleAssistant = await assistantFactory.CreateTitleAssistant();
 
-            var firstThread = conversation.Threads.FirstOrDefault();
+            var threadSummary = ExtractThreadSummaryFromConversation(conversation);
 
-            if (firstThread == null)
-            {
-                throw new InvalidOperationException($"Conversation {conversation.Id} doesn't have any threads");
-            }
-
-            var stringBuilder = new StringBuilder();
-
-            foreach (var turn in firstThread.Turns)
-            {
-                stringBuilder.AppendLine(turn.UserMessage.Content);
-                stringBuilder.AppendLine(turn.AssistantMessage.Content);
-            }
-
-            var userMessage = new UserMessage(stringBuilder.ToString(), 0);
+            var userMessage = new UserMessage(threadSummary, 0);
 
             await foreach (var response in titleAssistant.StreamAsync(userMessage))
             {
@@ -50,5 +37,30 @@ public class AssistantMessageAddedHandler(IConversationRepository conversationRe
 
             await mediator.PublishDomainEvents(conversation);
         }
+    }
+
+    private static string ExtractThreadSummaryFromConversation(Conversation conversation)
+    {
+        var thread = conversation.Threads.FirstOrDefault();
+
+        if (thread == null)
+        {
+            throw new InvalidOperationException($"Conversation {conversation.Id} doesn't have any threads");
+        }
+
+        if (thread.Turns.Count == 0)
+        {
+            throw new InvalidOperationException($"Conversation Thread {thread.Id}, doesn't have any conversations turns. Conversation Id : {conversation.Id}");
+        }
+
+        var stringBuilder = new StringBuilder();
+
+        foreach (var turn in thread.Turns)
+        {
+            stringBuilder.AppendLine(turn.UserMessage.Content);
+            stringBuilder.AppendLine(turn.AssistantMessage.Content);
+        }
+
+        return stringBuilder.ToString();
     }
 }
