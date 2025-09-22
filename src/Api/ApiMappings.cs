@@ -1,5 +1,6 @@
 ﻿using Api.Extensions;
 using Application.Conversations.Commands;
+using Application.Conversations.Queries;
 using Application.Dto;
 using Application.Extensions;
 using Application.Interfaces;
@@ -30,14 +31,15 @@ public static class ApiMappings
     public static WebApplication MapConversationApi(this WebApplication app)
     {
         app.MapGet(ApiConversationPath, 
-            async (IConversationQuery conversationQuery, HttpContext context) => Results.Ok(await conversationQuery.GetAllConversationsAsync(context.User.Id())));
+            async (IMediator mediator, HttpContext context) 
+                => Results.Ok(await mediator.Send(new GetConversationsQuery(context.User.Id()))));
 
         app.MapGet(ApiConversationSummariesPath,
-            async (IConversationQuery conversationQuery, HttpContext context) => Results.Ok(await conversationQuery.GetConversationSummaries(context.User.Id())));
+            async (IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new GetConversationSummariesQuery(context.User.Id()))));
 
 
         app.MapGet(ApiConversationById, 
-            async (Guid conversationId, IConversationQuery conversationQuery, HttpContext context) => Results.Ok(await conversationQuery.LoadAsync(context.User.Id(), conversationId)));
+            async (Guid conversationId, IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new GetConversationByIdQuery(context.User.Id(), conversationId))));
 
         app.MapPost(ApiConversationPath, 
             async (IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new CreateConversationCommand(context.User.Id()))));
