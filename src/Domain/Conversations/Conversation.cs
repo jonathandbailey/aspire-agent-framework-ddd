@@ -43,6 +43,8 @@ public class Conversation : Entity
         var thread = GetCurrentThread();
 
         thread.EndConversationTurn(content);
+
+        AddDomainEvent(new ConversationTurnEndedEvent(UserId, Id));
     }
 
     private void CreateNewThread()
@@ -54,11 +56,11 @@ public class Conversation : Entity
         CurrentThread = conversationThread.Id;
     }
 
-    public void UpdateTitle(string title, Guid userId)
+    public void UpdateTitle(string title)
     {
         Name = title;
 
-        AddDomainEvent(new ConversationTitleUpdatedEvent(userId,Id, Name));
+        AddDomainEvent(new ConversationTitleUpdatedEvent(UserId, Id, Name));
     }
 
     private ConversationThread GetCurrentThread()

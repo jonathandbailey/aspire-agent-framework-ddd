@@ -9,9 +9,9 @@ namespace Application.Events;
 
 public class AssistantMessageAddedHandler(IConversationRepository conversationRepository,
     IMediator mediator,
-    IAssistantFactory assistantFactory) : INotificationHandler<AssistantMessageAddedEvent>
+    IAssistantFactory assistantFactory) : INotificationHandler<ConversationTurnEndedEvent>
 {
-    public async Task Handle(AssistantMessageAddedEvent request, CancellationToken cancellationToken)
+    public async Task Handle(ConversationTurnEndedEvent request, CancellationToken cancellationToken)
     {
         var conversation = await conversationRepository.LoadAsync(request.UserId, request.ConversationId);
 
@@ -26,9 +26,15 @@ public class AssistantMessageAddedHandler(IConversationRepository conversationRe
                 throw new InvalidOperationException($"Conversation {conversation.Id} doesn't have any threads");
             }
 
-            
+            var stringBuilder = new StringBuilder();
 
-            var userMessage = new UserMessage(string.Empty, 0);
+            foreach (var turn in firstThread.Turns)
+            {
+                stringBuilder.AppendLine(turn.UserMessage.Content);
+                stringBuilder.AppendLine(turn.AssistantMessage.Content);
+            }
+
+            var userMessage = new UserMessage(stringBuilder.ToString(), 0);
 
             await foreach (var response in titleAssistant.StreamAsync(userMessage))
             {
@@ -36,7 +42,7 @@ public class AssistantMessageAddedHandler(IConversationRepository conversationRe
                 {
                     var conversationTitle = JsonOutputParser.Parse<ConversationTitle>(response);
 
-                    conversation.UpdateTitle(conversationTitle.Title, request.UserId);
+                    conversation.UpdateTitle(conversationTitle.Title);
                 }
             }
 
