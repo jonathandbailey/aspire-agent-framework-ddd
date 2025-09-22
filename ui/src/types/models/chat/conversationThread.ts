@@ -1,7 +1,7 @@
-import type { Message } from "./message";
+import type { ConversationTurn } from "./conversationTurn";
 
 export interface ConversationThread {
     id: string;
     title: string;
-    messages: Message[];
+    turns: ConversationTurn[];
 }
