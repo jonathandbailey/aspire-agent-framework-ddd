@@ -2,7 +2,7 @@
 using Application.Interfaces;
 using MediatR;
 
-namespace Application.Events;
+namespace Application.Events.Integration;
 
 public class StreamingApplicationEventHandler(IConversationClient client) : IRequestHandler<StreamingApplicationEvent>
 {

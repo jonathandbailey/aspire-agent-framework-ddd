@@ -4,7 +4,7 @@ using Domain.Conversations;
 using Domain.Events;
 using MediatR;
 
-namespace Application.Events;
+namespace Application.Conversations.Events;
 
 public class AssistantMessageAddedHandler(IConversationRepository conversationRepository,
     IMediator mediator,

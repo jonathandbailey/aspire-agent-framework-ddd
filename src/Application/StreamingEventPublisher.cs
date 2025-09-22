@@ -1,4 +1,4 @@
-﻿using Application.Events;
+﻿using Application.Events.Integration;
 using Application.Interfaces;
 using MediatR;
 

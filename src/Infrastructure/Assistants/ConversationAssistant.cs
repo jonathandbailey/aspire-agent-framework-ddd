@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using Application.Dto;
-using Application.Events;
+using Application.Events.Integration;
 using Application.Interfaces;
 using Infrastructure.Interfaces;
 using Microsoft.SemanticKernel.Agents;

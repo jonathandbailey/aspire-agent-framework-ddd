@@ -3,7 +3,7 @@ using Application.Interfaces;
 using Domain.Events;
 using MediatR;
 
-namespace Application.Events;
+namespace Application.Conversations.Events;
 
 public class ConversationTitleUpdatedHandler(IConversationClient client) : INotificationHandler<ConversationTitleUpdatedEvent>
 {

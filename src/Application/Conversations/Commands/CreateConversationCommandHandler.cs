@@ -2,7 +2,7 @@
 using MediatR;
 using Domain.Conversations;
 
-namespace Application.Commands;
+namespace Application.Conversations.Commands;
 
 public class CreateConversationCommandHandler(IConversationRepository conversationHistory) : IRequestHandler<CreateConversationCommand, Conversation>
 {

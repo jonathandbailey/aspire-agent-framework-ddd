@@ -1,5 +1,5 @@
 ﻿using Api.Extensions;
-using Application.Commands;
+using Application.Conversations.Commands;
 using Application.Dto;
 using Application.Extensions;
 using Application.Interfaces;

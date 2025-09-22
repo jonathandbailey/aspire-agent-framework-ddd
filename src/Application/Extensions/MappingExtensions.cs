@@ -1,4 +1,4 @@
-﻿using Application.Commands;
+﻿using Application.Conversations.Commands;
 using Application.Dto;
 using Domain.Conversations;
 

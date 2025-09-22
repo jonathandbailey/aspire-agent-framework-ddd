@@ -3,7 +3,7 @@ using Application.Interfaces;
 using Domain;
 using MediatR;
 
-namespace Application.Commands;
+namespace Application.Conversations.Commands;
 
 public class ChatCommandHandler(IConversationRepository conversationRepository,
     IMediator mediator,
