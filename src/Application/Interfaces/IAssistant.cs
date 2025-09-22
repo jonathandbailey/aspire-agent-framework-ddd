@@ -1,8 +1,9 @@
-﻿using Domain.Conversations;
+﻿using Application.Dto;
+using Domain.Conversations;
 
 namespace Application.Interfaces;
 
-public interface IAssistant
+public interface ITitleAssistant
 {
-    public IAsyncEnumerable<string> StreamAsync(UserMessage userMessage);
+    public Task<AssistantResponseDto> InvokeAsync(UserMessage userMessage);
 }

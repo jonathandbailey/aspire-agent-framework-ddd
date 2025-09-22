@@ -54,7 +54,7 @@ public class AssistantFactory(IAzureStorageRepository storageRepository, Kernel 
         return new ConversationAssistant(agent, new DefaultMemoryStrategy(), publisher);
     }
 
-    public async Task<IAssistant> CreateTitleAssistant()
+    public async Task<ITitleAssistant> CreateTitleAssistant()
     {
         string agentTemplate;
 
@@ -87,6 +87,6 @@ public class AssistantFactory(IAzureStorageRepository storageRepository, Kernel 
             Arguments = new KernelArguments(promptExecutionSettings)
         };
 
-        return new Assistant(agent);
+        return new TitleAssistant(agent);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Domain.Events;
+using System.Text;
 
 namespace Domain.Conversations;
 
@@ -45,6 +46,31 @@ public class Conversation : Entity
         thread.EndConversationTurn(content);
 
         AddDomainEvent(new ConversationTurnEndedEvent(UserId, Id));
+    }
+
+    public string GetConversationSummaryForTitleGeneration()
+    {
+        var thread = Threads.FirstOrDefault();
+
+        if (thread == null)
+        {
+            throw new InvalidOperationException($"Conversation {Id} doesn't have any threads");
+        }
+
+        if (thread.Turns.Count == 0)
+        {
+            throw new InvalidOperationException($"Conversation Thread {thread.Id}, doesn't have any conversations turns. Conversation Id : {Id}");
+        }
+
+        var stringBuilder = new StringBuilder();
+
+        foreach (var turn in thread.Turns)
+        {
+            stringBuilder.AppendLine(turn.UserMessage.Content);
+            stringBuilder.AppendLine(turn.AssistantMessage.Content);
+        }
+
+        return stringBuilder.ToString();
     }
 
     private void CreateNewThread()
