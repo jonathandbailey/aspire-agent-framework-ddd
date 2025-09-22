@@ -6,6 +6,7 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
 using System.Text;
+using Infrastructure.Dto;
 
 namespace Infrastructure.Assistants;
 
@@ -29,7 +30,7 @@ public class TitleAssistant(ChatCompletionAgent chatCompletionAgent) : ITitleAss
             throw new InvalidOperationException($"Title Assistant response does not contain valid JSON {content}");
         
 
-        var conversationTitle = JsonOutputParser.Parse<ConversationTitle>(content);
+        var conversationTitle = JsonOutputParser.Parse<AssistantResponseJsonTitle>(content);
 
         return new AssistantResponseDto { Content = conversationTitle.Title };
     }
