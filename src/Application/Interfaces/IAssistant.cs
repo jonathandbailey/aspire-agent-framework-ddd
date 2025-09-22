@@ -5,5 +5,5 @@ namespace Application.Interfaces;
 
 public interface ITitleAssistant
 {
-    public Task<AssistantResponseDto> InvokeAsync(UserMessage userMessage);
+    public Task<AssistantResponseDto> InvokeAsync(string content);
 }

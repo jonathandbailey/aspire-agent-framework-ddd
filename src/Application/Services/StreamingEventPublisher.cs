@@ -2,7 +2,7 @@
 using Application.Interfaces;
 using MediatR;
 
-namespace Application;
+namespace Application.Services;
 
 public class StreamingEventPublisher(IMediator mediator) : IStreamingEventPublisher
 {

@@ -1,20 +1,18 @@
-﻿using Application.Extensions;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Domain;
 using MediatR;
 
 namespace Application.Conversations.Commands;
 
 public class ChatCommandHandler(IConversationRepository conversationRepository,
-    IMediator mediator,
     IAssistantFactory assistantFactory) : IRequestHandler<ChatCommand>
 {
     public async Task Handle(ChatCommand request, CancellationToken cancellationToken)
     {
-        await Chat( request.Id, request.Message, request.UserId, request.ConversationId);
+        await Chat(request.Message, request.UserId, request.ConversationId);
     }
 
-    private async Task Chat(Guid id, string message, Guid userId, Guid conversationId)
+    private async Task Chat(string message, Guid userId, Guid conversationId)
     {
         Verify.NotEmpty(userId);
         Verify.NotEmpty(conversationId);
@@ -24,9 +22,7 @@ public class ChatCommandHandler(IConversationRepository conversationRepository,
         conversation.StartConversationTurn(message);
 
         await conversationRepository.SaveAsync(conversation);
-
-        await mediator.PublishDomainEvents(conversation);
-
+     
         var assistant = await assistantFactory.CreateConversationAssistant();
 
         var assistantResponseDto = await assistant.GenerateResponseAsync(conversation);
@@ -34,8 +30,5 @@ public class ChatCommandHandler(IConversationRepository conversationRepository,
         conversation.EndConversationTurn(assistantResponseDto.Content);
   
         await conversationRepository.SaveAsync(conversation);
-
-        await mediator.PublishDomainEvents(conversation);
-
     }
 }

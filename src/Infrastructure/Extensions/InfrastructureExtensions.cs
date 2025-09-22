@@ -1,9 +1,11 @@
 ﻿using Application.Interfaces;
+using Infrastructure.Adapters;
 using Infrastructure.Assistants;
 using Infrastructure.Interfaces;
 using Infrastructure.Queries;
 using Infrastructure.Settings;
 using Infrastructure.Storage;
+using MediatR;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +17,17 @@ public static class InfrastructureExtensions
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IAzureStorageRepository, AzureStorageRepository>();
-        services.AddScoped<IConversationRepository, ConversationRepository>();
+        services.AddScoped<ConversationRepository>();
+
+        services.AddScoped<IConversationRepository>(sp =>
+        {
+            var repository = sp.GetRequiredService<ConversationRepository>();
+            var mediator = sp.GetRequiredService<IMediator>();
+
+            return new ConversationRepositoryDomainAdapter(mediator, repository);
+        });
+
+
         services.AddScoped<IAssistantMemory, DefaultMemoryStrategy>();
         services.AddScoped<IAssistantFactory, AssistantFactory>();
         services.AddScoped<IConversationQuery, ConversationQuery>();
