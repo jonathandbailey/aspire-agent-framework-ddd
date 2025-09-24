@@ -5,5 +5,5 @@ namespace Application.Interfaces;
 
 public interface IConversationAssistant
 {
-    Task<AssistantResponseDto> GenerateResponseAsync(Conversation conversation);
+    Task<AssistantResponseDto> GenerateResponseAsync(Conversation conversation, Guid exchangeId);
 }

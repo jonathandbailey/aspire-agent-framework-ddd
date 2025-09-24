@@ -35,7 +35,7 @@ export class UIMessageFactory {
             id: crypto.randomUUID(),
             role: 'assistant',
             text: "",
-            isLoading: true,
+            isLoading: false,
             hasError: false,
             errorMessage: "",
         };

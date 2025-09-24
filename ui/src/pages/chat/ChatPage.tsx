@@ -17,6 +17,7 @@ import type { UIConversationThread } from "../../types/ui/UIConversationThread";
 import type { UIExchange } from "../../types/ui/UIExchange";
 import type { Message } from "../../types/models/chat/message";
 import type { ConversationExchange } from "../../types/models/chat/conversationExchange";
+import { useLiveExchanges } from "../../stores/exchange.store";
 
 export function mapMessage(dto: Message): UIMessage {
     return {
@@ -56,13 +57,13 @@ const ChatPage = () => {
     const [messages, setMessages] = useState<UIMessage[]>([]);
     const [responseMessage, setResponseMessage] = useState<UIMessage | null>(null);
     const [uiConversation, setUiConversation] = useState<UIConversation | null>(null);
+    const [threadId, setThreadId] = useState<string>("");
 
     const { id } = useParams();
 
     if (!id) throw new Error("Conversation id is required");
 
     const conversationId = id;
-
     const conversationService = new ConversationService();
 
     const { data: conversation } = useQuery({
@@ -73,13 +74,22 @@ const ChatPage = () => {
 
     useEffect(() => {
         if (conversation) {
-
-
-            setUiConversation(mapConversation(conversation));
+            const mapped = mapConversation(conversation);
+            setUiConversation(mapped);
+            // Get the first thread id (or handle as needed)
+            if (mapped.threads.length > 0) {
+                setThreadId(mapped.threads[0].id);
+            }
         }
     }, [conversation]);
 
+    // Use threadId for useLiveExchanges
+    const { addExchange, appendToAssistantMessage } =
+        useLiveExchanges(threadId)
+
     streamingService.on("chat", (response: ChatResponseDto) => {
+
+        appendToAssistantMessage(response.id, response.message);
 
         setMessages((prev) =>
             prev.map((msg) =>
@@ -99,12 +109,21 @@ const ChatPage = () => {
         const userMessage = UIMessageFactory.createUserMessage(value);
         setMessages(prev => [...prev, userMessage]);
 
+
+
         const assistantMessage = UIMessageFactory.createAssistantMessage();
         setMessages(prev => [...prev, assistantMessage]);
 
         setResponseMessage(assistantMessage);
 
         var exchangeId = await conversationService.CreateConversationExchange(conversationId);
+
+        addExchange({
+            id: exchangeId,
+            user: userMessage,
+            assistant: assistantMessage,
+            isPending: true,
+        })
 
         try {
             await conversationService.startConversationExchange(

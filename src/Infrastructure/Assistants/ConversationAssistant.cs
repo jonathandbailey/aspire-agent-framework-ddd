@@ -11,7 +11,7 @@ namespace Infrastructure.Assistants;
 
 public class ConversationAssistant(ChatCompletionAgent chatCompletionAgent, IAssistantMemory memory, IStreamingEventPublisher publisher) : IConversationAssistant
 {
-    public async Task<AssistantResponseDto> GenerateResponseAsync(Conversation conversation)
+    public async Task<AssistantResponseDto> GenerateResponseAsync(Conversation conversation, Guid exchangeId)
     {
         var thread = memory.Initialize(conversation);
 
@@ -21,7 +21,7 @@ public class ConversationAssistant(ChatCompletionAgent chatCompletionAgent, IAss
         {
             if (response.Message.Content != null)
             {
-                await publisher.Send(new StreamingApplicationEvent(conversation.UserId, Guid.NewGuid(), conversation.Id, response.Message.Content));
+                await publisher.Send(new StreamingApplicationEvent(conversation.UserId, exchangeId, conversation.Id, response.Message.Content));
 
                 stringBuilder.Append(response.Message.Content);
             }

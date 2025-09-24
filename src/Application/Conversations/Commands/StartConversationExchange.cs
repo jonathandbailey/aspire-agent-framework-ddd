@@ -17,7 +17,7 @@ public class StartConversationExchangeCommandHandler(IConversationRepository con
 
         var assistant = await assistantFactory.CreateConversationAssistant();
 
-        var assistantResponseDto = await assistant.GenerateResponseAsync(conversation);
+        var assistantResponseDto = await assistant.GenerateResponseAsync(conversation, request.ExchangeId);
 
         conversation.CompleteConversationExchange(ExchangeId.FromGuid(request.ExchangeId), assistantResponseDto.Content);
 
