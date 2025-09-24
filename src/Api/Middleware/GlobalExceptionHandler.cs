@@ -1,15 +1,13 @@
 ﻿using System.Text.Json;
 using FluentValidation;
 using Infrastructure.Exceptions;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Middleware;
 
-public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IMiddleware
+public class GlobalExceptionHandler : IMiddleware, IExceptionHandler
 {
-    private readonly ILogger<GlobalExceptionHandler> _logger = logger;
-
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         try
@@ -18,17 +16,17 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IM
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "An unhandled exception occurred.");
-
-            var problemDetails = CreateProblemDetails(exception, context);
-
-            context.Response.ContentType = "application/problem+json";
-            context.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
-
-            var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
-            await context.Response.WriteAsync(problemDetailsJson);
+            await Handle(context, exception, CancellationToken.None);
         }
     }
+
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+    {
+        await Handle(httpContext, exception, cancellationToken);
+
+        return true;
+    }
+
 
     private static ProblemDetails CreateProblemDetails(Exception exception, HttpContext context)
     {
@@ -82,4 +80,15 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IM
         return errors;
     }
 
+  
+    private static async Task Handle(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+    {
+        var problemDetails = CreateProblemDetails(exception, httpContext);
+
+        httpContext.Response.ContentType = "application/problem+json";
+        httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
+
+        var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
+        await httpContext.Response.WriteAsync(problemDetailsJson, cancellationToken: cancellationToken);
+    }
 }

@@ -41,6 +41,8 @@ else
     app.UseHttpsRedirection();
 }
 
+app.UseExceptionHandler(options => { });
+
 app.MapHub<ChatHub>("hub");
 
 app.UseCorsPolicyServiceDiscovery();
@@ -49,6 +51,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseMiddleware<GlobalExceptionHandler>();
 
 app.Run();
