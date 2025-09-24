@@ -11,8 +11,8 @@ public static class MappingExtensions
         return new ChatResponseDto(assistantMessage.Id, assistantMessage.Content, conversationId);
     }
 
-    public static ChatCommand Map(this ChatRequestDto requestDto, Guid userId)
+    public static StartConversationExchangeCommand Map(this ChatRequestDto requestDto, Guid userId)
     {
-        return new ChatCommand(requestDto.Id, requestDto.Message, userId, requestDto.ConversationId);
+        return new StartConversationExchangeCommand(requestDto.Message, userId, requestDto.ConversationId);
     }
 }
