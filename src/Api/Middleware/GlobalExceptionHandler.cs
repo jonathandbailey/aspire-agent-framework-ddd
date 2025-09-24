@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using FluentValidation;
 using Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -48,6 +49,14 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IM
                 Status = StatusCodes.Status500InternalServerError,
                 Detail = "Applications Services are not available. Please try again later."
             },
+
+            ValidationException => 
+                new ValidationProblemDetails(GetValidationErrors(exception))
+            {
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = exception.Message
+            },
         
             _ => new ProblemDetails
             {
@@ -58,4 +67,19 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IM
             }
         };
     }
+
+    private static Dictionary<string, string[]> GetValidationErrors(Exception exception)
+    {
+        if (exception is not ValidationException validationException)
+        {
+            throw new InvalidOperationException("Exception must be of type ValidationException.");
+        }
+
+        var errors = validationException.Errors
+            .GroupBy(e => e.PropertyName, e => e.ErrorMessage)
+            .ToDictionary(failureGroup => failureGroup.Key, failureGroup => failureGroup.ToArray());
+       
+        return errors;
+    }
+
 }

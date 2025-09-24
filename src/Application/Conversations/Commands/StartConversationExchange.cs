@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces;
-using FluentValidation;
 using MediatR;
 
 namespace Application.Conversations.Commands;
@@ -26,16 +25,3 @@ public class ChatCommandHandler(IConversationRepository conversationRepository,
 }
 
 public sealed record StartConversationExchangeCommand(string Message, Guid UserId, Guid ConversationId) : IRequest;
-
-public sealed class StartConversationExchangeCommandValidator : AbstractValidator<StartConversationExchangeCommand>
-{
-    public StartConversationExchangeCommandValidator()
-    {
-        RuleFor(v => v.Message)
-            .NotEmpty()
-            .NotNull();
-
-        RuleFor(v => v.UserId).NotEmpty();
-        RuleFor(v => v.ConversationId).NotEmpty();
-    }
-}

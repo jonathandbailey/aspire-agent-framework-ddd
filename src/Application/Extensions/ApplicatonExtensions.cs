@@ -1,8 +1,9 @@
-﻿using Application.Interfaces;
+﻿using Application.Behaviours;
+using Application.Interfaces;
 using Application.Services;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using FluentValidation;
 
 namespace Application.Extensions;
 
@@ -12,6 +13,7 @@ public static class ApplicationExtensions
     {
         services.AddMediatR(cfg => {
             cfg.RegisterServicesFromAssembly(typeof(ApplicationExtensions).Assembly);
+            cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
 
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
