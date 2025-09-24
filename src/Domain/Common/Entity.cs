@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Domain;
+namespace Domain.Common;
 
 public abstract class Entity
 {

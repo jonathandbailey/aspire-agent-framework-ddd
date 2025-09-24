@@ -1,11 +1,13 @@
-﻿namespace Domain.Conversations;
+﻿using Domain.Common;
+
+namespace Domain.Conversations;
 
 public class ConversationThread : Entity
 {
-    private readonly List<ConversationTurn> _turns = [];
+    private readonly List<ConversationExchange> _exchanges = [];
     public int Index { get; private set; }
 
-    public IReadOnlyCollection<ConversationTurn> Turns => _turns;
+    public IReadOnlyCollection<ConversationExchange> Exchanges => _exchanges;
 
     public ConversationThread(int index)
     {
@@ -13,22 +15,26 @@ public class ConversationThread : Entity
         Index = index;
     }
 
-    public ConversationThread(Guid id, int index, List<ConversationTurn> turns)
+    public ConversationThread(Guid id, int index, List<ConversationExchange> exchanges)
     {
         Id = id;
         Index = index;
-        _turns = turns;
+        _exchanges = exchanges;
     }
 
-    public void StartConversationTurn(string content)
+    public ExchangeId StartConversationExchange(string content)
     {
-        _turns.Add(new ConversationTurn(Guid.NewGuid(), _turns.Count,  new UserMessage(content, 0), new AssistantMessage(string.Empty, 1)));
+        var exchange = new ConversationExchange(Guid.NewGuid(), _exchanges.Count, new UserMessage(content, 0), new AssistantMessage(string.Empty, 1));
+  
+        _exchanges.Add(exchange);
+
+        return exchange.ExchangeId;
     }
 
-    public void EndConversationTurn(string content)
+    public void CompleteConversationExchange(ExchangeId exchangeId, string content)
     {
-        var turn = _turns.Last();
+        var exchange = _exchanges.First(x => Equals(x.ExchangeId, exchangeId));
 
-        turn.AssistantMessage.Update(content);
+        exchange.AssistantMessage.Update(content);
     }
 }

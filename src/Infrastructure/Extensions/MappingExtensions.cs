@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Common;
 using Domain.Conversations;
 using Infrastructure.Dto;
 
@@ -12,19 +12,19 @@ public static class MappingExtensions
     }
 
 
-    private static ConversationTurnDto Map(this ConversationTurn turn)
+    private static ConversationTurnDto Map(this ConversationExchange exchange)
     {
-        return new ConversationTurnDto(turn.Id, turn.Index, turn.UserMessage.Map(), turn.AssistantMessage.Map());
+        return new ConversationTurnDto(exchange.Id, exchange.Index, exchange.UserMessage.Map(), exchange.AssistantMessage.Map());
     }
 
-    private static ConversationTurn Map(this ConversationTurnDto turnDto)
+    private static ConversationExchange Map(this ConversationTurnDto turnDto)
     {
-        return new ConversationTurn(turnDto.Id, turnDto.Index, turnDto.UserMessage.MapUserMessage(), turnDto.AssistantMessage.MapAssistantMessage());
+        return new ConversationExchange(turnDto.Id, turnDto.Index, turnDto.UserMessage.MapUserMessage(), turnDto.AssistantMessage.MapAssistantMessage());
     }
 
     private static ConversationThreadDto Map(this ConversationThread thread)
     {
-        var turns = thread.Turns.Select(turn => turn.Map()).ToList();
+        var turns = thread.Exchanges.Select(turn => turn.Map()).ToList();
 
         return new ConversationThreadDto(thread.Id, thread.Index, turns);
     }

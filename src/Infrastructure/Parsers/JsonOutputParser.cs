@@ -20,7 +20,7 @@ public static class JsonOutputParser
     /// <returns>True if a JSON block is found; otherwise, false.</returns>
     public static bool HasJson(string content)
     {
-        Domain.Verify.NotNullOrWhiteSpace(content);
+        Domain.Common.Verify.NotNullOrWhiteSpace(content);
 
         var match = JsonBlockRegex.Match(content);
 
@@ -37,7 +37,7 @@ public static class JsonOutputParser
     /// <exception cref="InvalidOperationException">Thrown when deserialization results in a null object.</exception>
     public static T Parse<T>(string content)
     {
-        Domain.Verify.NotNullOrWhiteSpace(content);
+        Domain.Common.Verify.NotNullOrWhiteSpace(content);
 
         var match = JsonBlockRegex.Match(content);
 
@@ -59,7 +59,7 @@ public static class JsonOutputParser
     /// <returns>The content string with JSON blocks removed.</returns>
     public static string Remove(string content)
     {
-        Domain.Verify.NotNullOrWhiteSpace(content);
+        Domain.Common.Verify.NotNullOrWhiteSpace(content);
 
         var result = JsonBlockRegexForRemoval.Replace(content, string.Empty);
         return result;

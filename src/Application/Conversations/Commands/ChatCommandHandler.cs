@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Domain;
+using Domain.Common;
 using MediatR;
 
 namespace Application.Conversations.Commands;
@@ -19,7 +19,7 @@ public class ChatCommandHandler(IConversationRepository conversationRepository,
        
         var conversation = await conversationRepository.LoadAsync(userId, conversationId);
 
-        conversation.StartConversationTurn(message);
+        var exchangeId = conversation.StartConversationExchange(message);
 
         await conversationRepository.SaveAsync(conversation);
      
@@ -27,7 +27,7 @@ public class ChatCommandHandler(IConversationRepository conversationRepository,
 
         var assistantResponseDto = await assistant.GenerateResponseAsync(conversation);
 
-        conversation.EndConversationTurn(assistantResponseDto.Content);
+        conversation.CompleteConversationExchange(exchangeId, assistantResponseDto.Content);
   
         await conversationRepository.SaveAsync(conversation);
     }

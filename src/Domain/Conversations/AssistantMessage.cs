@@ -1,4 +1,6 @@
-﻿namespace Domain.Conversations;
+﻿using Domain.Common;
+
+namespace Domain.Conversations;
 
 public class AssistantMessage : Message
 {

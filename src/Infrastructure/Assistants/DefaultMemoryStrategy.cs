@@ -15,7 +15,7 @@ public class DefaultMemoryStrategy : IAssistantMemory
 
         foreach (var thread in conversation.Threads)
         {
-            foreach (var turn in thread.Turns)
+            foreach (var turn in thread.Exchanges)
             {
                 agentThread.ChatHistory.Add(new ChatMessageContent(AuthorRole.User, turn.UserMessage.Content));
                 agentThread.ChatHistory.Add(new ChatMessageContent(AuthorRole.Assistant, turn.AssistantMessage.Content));
