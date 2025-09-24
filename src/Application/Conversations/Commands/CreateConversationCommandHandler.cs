@@ -8,7 +8,7 @@ public class CreateConversationCommandHandler(IConversationRepository conversati
 {
     public async Task<Conversation> Handle(CreateConversationCommand request, CancellationToken cancellationToken)
     {
-        var conversation = new Conversation(request.UserId);
+        var conversation = new Conversation(UserId.FromGuid(request.UserId));
 
         await conversationHistory.SaveAsync(conversation);
 

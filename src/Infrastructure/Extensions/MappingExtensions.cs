@@ -19,7 +19,7 @@ public static class MappingExtensions
 
     private static ConversationExchange Map(this ConversationExchangeDto exchangeDto)
     {
-        return new ConversationExchange(exchangeDto.Id, exchangeDto.Index, exchangeDto.UserMessage.MapUserMessage(), exchangeDto.AssistantMessage.MapAssistantMessage());
+        return new ConversationExchange(ExchangeId.FromGuid(exchangeDto.Id),  exchangeDto.Index, exchangeDto.UserMessage.MapUserMessage(), exchangeDto.AssistantMessage.MapAssistantMessage());
     }
 
     private static ConversationThreadDto Map(this ConversationThread thread)
@@ -33,7 +33,7 @@ public static class MappingExtensions
     {
         var conversationStorageThreads = conversation.Threads.Select(thread => thread.Map()).ToList();
 
-        return new ConversationDto(conversation.Id, conversation.UserId, conversation.Name, conversationStorageThreads);
+        return new ConversationDto(conversation.Id, conversation.UserId.Value, conversation.Name, conversationStorageThreads);
     }
    
     private static AssistantMessage MapAssistantMessage(this ConversationMessageDto messageDto)
@@ -68,6 +68,6 @@ public static class MappingExtensions
     {
         var threads = conversationDto.Threads.Select(storageThread => storageThread.Map()).ToList();
 
-        return new Conversation(conversationDto.Id,conversationDto.UserId, conversationDto.Name, threads);
+        return new Conversation(conversationDto.Id, UserId.FromGuid(conversationDto.UserId), conversationDto.Name, threads);
     }
 }

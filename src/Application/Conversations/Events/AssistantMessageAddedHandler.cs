@@ -9,7 +9,7 @@ public class AssistantMessageAddedHandler(IConversationRepository conversationRe
 {
     public async Task Handle(ConversationTurnEndedEvent request, CancellationToken cancellationToken)
     {
-        var conversation = await conversationRepository.LoadAsync(request.UserId, request.ConversationId);
+        var conversation = await conversationRepository.LoadAsync(request.UserId.Value, request.ConversationId);
 
         if (string.IsNullOrWhiteSpace(conversation.Name))
         {

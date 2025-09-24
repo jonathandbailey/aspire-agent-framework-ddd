@@ -8,6 +8,6 @@ public class StreamingApplicationEventHandler(IConversationClient client) : IReq
 {
     public async Task Handle(StreamingApplicationEvent request, CancellationToken cancellationToken)
     {
-        await client.ChatWithUser(request.UserId, new ChatResponseDto(request.MessageId, request.Content, request.ConversationId));
+        await client.ChatWithUser(request.UserId.Value, new ChatResponseDto(request.MessageId, request.Content, request.ConversationId));
     }
 }

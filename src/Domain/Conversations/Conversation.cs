@@ -12,9 +12,9 @@ public class Conversation : Entity
 
     public IReadOnlyCollection<ConversationThread> Threads => _threads;
    
-    public Guid UserId { get; }
+    public UserId UserId { get; }
 
-    public Conversation(Guid userId)
+    public Conversation(UserId userId)
     {
         Id = Guid.NewGuid();
         Name = string.Empty;
@@ -22,7 +22,7 @@ public class Conversation : Entity
         CreateNewThread();
     }
 
-    public Conversation(Guid id, Guid userId, string name, List<ConversationThread> threads)
+    public Conversation(Guid id, UserId userId, string name, List<ConversationThread> threads)
     {
         Id = id;
         UserId = userId;

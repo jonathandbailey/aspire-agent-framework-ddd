@@ -12,10 +12,10 @@ public class ConversationExchange : Entity
 
     public AssistantMessage AssistantMessage { get; private set; }
 
-    public ConversationExchange(Guid id, int index, UserMessage userMessage, AssistantMessage assistantMessage)
+    public ConversationExchange(ExchangeId exchangeId, int index, UserMessage userMessage, AssistantMessage assistantMessage)
     {
-        Id = id;
-        ExchangeId = ExchangeId.FromGuid(id);
+        Id = exchangeId.Value;
+        ExchangeId = exchangeId;
         Index = index;
         UserMessage = userMessage;
         AssistantMessage = assistantMessage;

@@ -30,7 +30,7 @@ public class ConversationRepository(IAzureStorageRepository storageRepository, I
         {
             var serializedConversation = JsonSerializer.Serialize(conversation.Map(), SerializerOptions);
 
-            await storageRepository.UploadTextBlobAsync(GetFullBlobName(conversation.UserId, conversation.Id), BlobContainerName, serializedConversation, ApplicationJsonContentType);
+            await storageRepository.UploadTextBlobAsync(GetFullBlobName(conversation.UserId.Value, conversation.Id), BlobContainerName, serializedConversation, ApplicationJsonContentType);
         }
         catch (Exception exception)
         {

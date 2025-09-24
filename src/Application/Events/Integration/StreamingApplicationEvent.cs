@@ -1,5 +1,6 @@
-﻿using MediatR;
+﻿using Domain.Conversations;
+using MediatR;
 
 namespace Application.Events.Integration;
 
-public sealed record StreamingApplicationEvent(Guid UserId, Guid MessageId , Guid ConversationId, string Content) : IRequest;
+public sealed record StreamingApplicationEvent(UserId UserId, Guid MessageId , Guid ConversationId, string Content) : IRequest;

@@ -9,6 +9,6 @@ public class ConversationTitleUpdatedHandler(IConversationClient client) : INoti
 {
     public async Task Handle(ConversationTitleUpdatedEvent notification, CancellationToken cancellationToken)
     {
-        await client.ExecuteCommand(notification.UserId, new ClientCommandUpdateConversationTitle(notification.ConversationId, notification.Title));
+        await client.ExecuteCommand(notification.UserId.Value, new ClientCommandUpdateConversationTitle(notification.ConversationId, notification.Title));
     }
 }

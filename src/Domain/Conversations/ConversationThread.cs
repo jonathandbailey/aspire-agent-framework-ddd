@@ -24,7 +24,7 @@ public class ConversationThread : Entity
 
     public ExchangeId StartConversationExchange(string content)
     {
-        var exchange = new ConversationExchange(Guid.NewGuid(), _exchanges.Count, new UserMessage(content, 0), new AssistantMessage(string.Empty, 1));
+        var exchange = new ConversationExchange(ExchangeId.New(), _exchanges.Count, new UserMessage(content, 0), new AssistantMessage(string.Empty, 1));
   
         _exchanges.Add(exchange);
 
