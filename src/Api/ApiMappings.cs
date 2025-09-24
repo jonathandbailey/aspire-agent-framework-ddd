@@ -3,7 +3,6 @@ using Application.Conversations.Commands;
 using Application.Conversations.Queries;
 using Application.Dto;
 using Application.Extensions;
-using Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +10,11 @@ namespace Api;
 
 public static class ApiMappings
 {
-    private const string ApiConversationPath = "api/conversations";
-    private const string ApiConversationSummariesPath = "api/conversations/summaries";
+    private const string ApiConversationsRoot = "api/conversations";
+    private const string ApiConversationsPath = "/";
+    private const string ApiConversationSummariesPath = "summaries";
     private const string ApiChatPath = "api/chat";
-    private const string ApiConversationById = "api/conversations/{conversationId:guid}";
+    private const string ApiConversationById = "{conversationId:guid}";
 
     public static WebApplication MapChatApi(this WebApplication app)
     {
@@ -30,18 +30,20 @@ public static class ApiMappings
 
     public static WebApplication MapConversationApi(this WebApplication app)
     {
-        app.MapGet(ApiConversationPath, 
+        var api = app.MapGroup(ApiConversationsRoot);
+
+        api.MapGet(ApiConversationsPath, 
             async (IMediator mediator, HttpContext context) 
                 => Results.Ok(await mediator.Send(new GetConversationsQuery(context.User.Id()))));
 
-        app.MapGet(ApiConversationSummariesPath,
+        api.MapGet(ApiConversationSummariesPath,
             async (IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new GetConversationSummariesQuery(context.User.Id()))));
 
 
-        app.MapGet(ApiConversationById, 
+        api.MapGet(ApiConversationById, 
             async (Guid conversationId, IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new GetConversationByIdQuery(context.User.Id(), conversationId))));
 
-        app.MapPost(ApiConversationPath, 
+        api.MapPost(ApiConversationsPath, 
             async (IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new CreateConversationCommand(context.User.Id()))));
 
         return app;
