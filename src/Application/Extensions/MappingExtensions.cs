@@ -13,6 +13,6 @@ public static class MappingExtensions
 
     public static StartConversationExchangeCommand Map(this ChatRequestDto requestDto, Guid userId)
     {
-        return new StartConversationExchangeCommand(requestDto.Message, userId, requestDto.ConversationId);
+        return new StartConversationExchangeCommand(requestDto.Message, userId, requestDto.ConversationId, requestDto.ExchangeId);
     }
 }

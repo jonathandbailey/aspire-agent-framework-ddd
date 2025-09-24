@@ -22,4 +22,9 @@ export class ConversationService {
         const response = await apiClient.post<Conversation>(`api/conversations`);
         return response.data;
     }
+
+    async CreateConversationExchange(conversationId: string): Promise<string> {
+        const response = await apiClient.post<string>(`api/conversations/${conversationId}/exchanges`);
+        return response.data;
+    }
 }

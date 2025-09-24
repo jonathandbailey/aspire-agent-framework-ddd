@@ -30,11 +30,18 @@ public class Conversation : Entity
         _threads = threads;
     }
 
-    public ExchangeId StartConversationExchange(string content)
+    public ExchangeId CreateConversationExchange()
     {
         var thread = GetCurrentThread();
 
-        return thread.StartConversationExchange(content);
+        return thread.CreateConversationExchange();
+    }
+
+    public ExchangeId StartConversationExchange(string content, ExchangeId exchangeId)
+    {
+        var thread = GetCurrentThread();
+
+        return thread.StartConversationExchange(content, exchangeId);
     }
 
     public void CompleteConversationExchange(ExchangeId exchangeId, string content)

@@ -11,6 +11,7 @@ namespace Api;
 public static class ApiMappings
 {
     private const string ApiConversationsRoot = "api/conversations";
+    private const string ApiConversationExchange = "/{conversationId:guid}/exchanges";
     private const string ApiConversationsPath = "/";
     private const string ApiConversationSummariesPath = "summaries";
     private const string ApiChatPath = "api/chat";
@@ -45,6 +46,10 @@ public static class ApiMappings
 
         api.MapPost(ApiConversationsPath, 
             async (IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new CreateConversationCommand(context.User.Id()))));
+
+        api.MapPost(ApiConversationExchange,
+            async (Guid conversationId, IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new CreateConversationExchangeCommand(context.User.Id(), conversationId))));
+
 
         return app;
     }

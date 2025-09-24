@@ -66,11 +66,14 @@ const ChatPage = () => {
 
         setResponseMessage(assistantMessage);
 
+        var exchangeId = await conversationService.CreateConversationExchange(conversationId);
+
         try {
             await chatService.sendMessage(
                 value,
                 assistantMessage.id,
-                conversationId
+                conversationId,
+                exchangeId
             );
         } catch (err) {
         }

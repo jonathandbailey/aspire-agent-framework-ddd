@@ -22,10 +22,19 @@ public class ConversationThread : Entity
         _exchanges = exchanges;
     }
 
-    public ExchangeId StartConversationExchange(string content)
+    public ExchangeId StartConversationExchange(string content, ExchangeId exchangeId)
     {
-        var exchange = new ConversationExchange(ExchangeId.New(), _exchanges.Count, new UserMessage(content, 0), new AssistantMessage(string.Empty, 1));
-  
+        var exchange = _exchanges.First(x => Equals(x.ExchangeId, exchangeId));
+        
+        exchange.UserMessage.Update(content);
+
+        return exchange.ExchangeId;
+    }
+
+    public ExchangeId CreateConversationExchange()
+    {
+        var exchange = new ConversationExchange(ExchangeId.New(), _exchanges.Count, new UserMessage(string.Empty, 0), new AssistantMessage(string.Empty, 1));
+
         _exchanges.Add(exchange);
 
         return exchange.ExchangeId;

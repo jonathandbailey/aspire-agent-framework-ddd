@@ -12,6 +12,7 @@ public sealed class StartConversationExchangeCommandValidator : AbstractValidato
 
         RuleFor(v => v.UserId).NotEmpty();
         RuleFor(v => v.ConversationId).NotEmpty();
+        RuleFor(v => v.ExchangeId).NotEmpty();
     }
 }
 
@@ -20,5 +21,14 @@ public sealed class CreateConversationCommandValidator : AbstractValidator<Creat
     public CreateConversationCommandValidator()
     {
         RuleFor(v => v.UserId).NotEmpty();
+    }
+}
+
+public sealed class CreateConversationExchangeCommandValidator : AbstractValidator<CreateConversationExchangeCommand>
+{
+    public CreateConversationExchangeCommandValidator()
+    {
+        RuleFor(v => v.UserId).NotEmpty();
+        RuleFor(v => v.ConversationId).NotEmpty();
     }
 }
