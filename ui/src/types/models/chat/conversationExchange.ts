@@ -1,6 +1,6 @@
 import type { Message } from "./message";
 
-export interface ConversationTurn {
+export interface ConversationExchange {
     id: string;
     title: string;
     userMessage: Message;

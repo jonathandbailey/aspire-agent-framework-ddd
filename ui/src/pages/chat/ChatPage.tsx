@@ -32,7 +32,7 @@ const ChatPage = () => {
     useEffect(() => {
         if (conversation) {
             const allMessages = conversation.threads.flatMap(thread =>
-                thread.turns.flatMap(turn => [
+                thread.exchanges.flatMap(turn => [
                     UIMessageFactory.createMessage(turn.userMessage),
                     UIMessageFactory.createMessage(turn.assistantMessage)
                 ])

@@ -12,14 +12,14 @@ public static class MappingExtensions
     }
 
 
-    private static ConversationTurnDto Map(this ConversationExchange exchange)
+    private static ConversationExchangeDto Map(this ConversationExchange exchange)
     {
-        return new ConversationTurnDto(exchange.Id, exchange.Index, exchange.UserMessage.Map(), exchange.AssistantMessage.Map());
+        return new ConversationExchangeDto(exchange.Id, exchange.Index, exchange.UserMessage.Map(), exchange.AssistantMessage.Map());
     }
 
-    private static ConversationExchange Map(this ConversationTurnDto turnDto)
+    private static ConversationExchange Map(this ConversationExchangeDto exchangeDto)
     {
-        return new ConversationExchange(turnDto.Id, turnDto.Index, turnDto.UserMessage.MapUserMessage(), turnDto.AssistantMessage.MapAssistantMessage());
+        return new ConversationExchange(exchangeDto.Id, exchangeDto.Index, exchangeDto.UserMessage.MapUserMessage(), exchangeDto.AssistantMessage.MapAssistantMessage());
     }
 
     private static ConversationThreadDto Map(this ConversationThread thread)
@@ -33,8 +33,7 @@ public static class MappingExtensions
     {
         var conversationStorageThreads = conversation.Threads.Select(thread => thread.Map()).ToList();
 
-        return new ConversationDto(conversation.Id, conversation.UserId, conversation.Name, conversation.CurrentThread,
-            conversationStorageThreads);
+        return new ConversationDto(conversation.Id, conversation.UserId, conversation.Name, conversationStorageThreads);
     }
    
     private static AssistantMessage MapAssistantMessage(this ConversationMessageDto messageDto)
@@ -60,7 +59,7 @@ public static class MappingExtensions
 
     private static ConversationThread Map(this ConversationThreadDto threadDto)
     {
-        var turns = threadDto.Turns.Select(turn => turn.Map()).ToList();
+        var turns = threadDto.Exchanges.Select(turn => turn.Map()).ToList();
 
         return new ConversationThread(threadDto.Id, threadDto.Index, turns);
     }
@@ -69,6 +68,6 @@ public static class MappingExtensions
     {
         var threads = conversationDto.Threads.Select(storageThread => storageThread.Map()).ToList();
 
-        return new Conversation(conversationDto.Id,conversationDto.UserId, conversationDto.Name, conversationDto.CurrentThread, threads);
+        return new Conversation(conversationDto.Id,conversationDto.UserId, conversationDto.Name, threads);
     }
 }

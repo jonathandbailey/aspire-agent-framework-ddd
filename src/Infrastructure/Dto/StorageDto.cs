@@ -1,10 +1,10 @@
 ﻿namespace Infrastructure.Dto
 {
-    public record ConversationDto(Guid Id, Guid UserId, string Name, Guid CurrentThread, List<ConversationThreadDto> Threads);
+    public record ConversationDto(Guid Id, Guid UserId, string Name, List<ConversationThreadDto> Threads);
 
-    public sealed record ConversationThreadDto(Guid Id,int Index, List<ConversationTurnDto> Turns);
+    public sealed record ConversationThreadDto(Guid Id,int Index, List<ConversationExchangeDto> Exchanges);
 
-    public sealed record ConversationTurnDto(
+    public sealed record ConversationExchangeDto(
         Guid Id,
         int Index,
         ConversationMessageDto UserMessage,

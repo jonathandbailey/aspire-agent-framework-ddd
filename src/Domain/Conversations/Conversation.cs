@@ -11,10 +11,8 @@ public class Conversation : Entity
     private readonly List<ConversationThread> _threads = [];
 
     public IReadOnlyCollection<ConversationThread> Threads => _threads;
-
-    public Guid CurrentThread { get; private set; }
-
-    public Guid UserId { get; private set; }
+   
+    public Guid UserId { get; }
 
     public Conversation(Guid userId)
     {
@@ -24,12 +22,11 @@ public class Conversation : Entity
         CreateNewThread();
     }
 
-    public Conversation(Guid id, Guid userId, string name, Guid currentThread, List<ConversationThread> threads)
+    public Conversation(Guid id, Guid userId, string name, List<ConversationThread> threads)
     {
         Id = id;
         UserId = userId;
         Name = name;
-        CurrentThread = currentThread;
         _threads = threads;
     }
 
@@ -79,8 +76,6 @@ public class Conversation : Entity
         var conversationThread = new ConversationThread(_threads.Count);
 
         _threads.Add(conversationThread);
-
-        CurrentThread = conversationThread.Id;
     }
 
     public void UpdateTitle(string title)
@@ -92,9 +87,6 @@ public class Conversation : Entity
 
     private ConversationThread GetCurrentThread()
     {
-        var thread = Threads.FirstOrDefault(x => x.Id == CurrentThread)
-                     ?? throw new ArgumentException($"Thread {CurrentThread} does not exist in conversation {Id} ");
-
-        return thread;
+        return Threads.Last();
     }
 }
