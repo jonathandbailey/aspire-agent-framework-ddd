@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChatService } from "../../services/chat/chat.service";
 import ChatInput from "../../components/chat/ChatInput";
 
 import type { ChatResponseDto } from "../../types/dto/chat-response.dto";
@@ -9,17 +8,60 @@ import type { UIMessage } from "../../types/ui/UIMessage";
 import { UIMessageFactory } from "../../factories/UIMessageFactory";
 import { ConversationService } from "../../services/chat/conversation.service";
 import { useParams } from "react-router-dom";
-import ChatConversation from "../../components/chat/ChatConversation";
+import { Flex } from "antd";
+import ConversationComponent from "../../components/chat/Conversation";
+import type { Conversation } from "../../types/models/chat/conversation";
+import type { UIConversation } from "../../types/ui/UIConversation";
+import type { ConversationThread } from "../../types/models/chat/conversationThread";
+import type { UIConversationThread } from "../../types/ui/UIConversationThread";
+import type { UIExchange } from "../../types/ui/UIExchange";
+import type { Message } from "../../types/models/chat/message";
+import type { ConversationExchange } from "../../types/models/chat/conversationExchange";
+
+export function mapMessage(dto: Message): UIMessage {
+    return {
+        id: dto.id,
+        role: dto.role,
+        text: dto.content,
+        isLoading: false,
+        hasError: false,
+        errorMessage: "",
+    }
+}
+
+export function mapExchange(dto: ConversationExchange): UIExchange {
+    return {
+        id: dto.id,
+        user: mapMessage(dto.userMessage),
+        assistant: mapMessage(dto.assistantMessage),
+    }
+}
+
+function mapThread(dto: ConversationThread): UIConversationThread {
+    return {
+        id: dto.id,
+        exchanges: dto.exchanges.map(mapExchange),
+    }
+}
+
+function mapConversation(dto: Conversation): UIConversation {
+    return {
+        id: dto.id,
+        title: dto.name,
+        threads: dto.threads.map(mapThread),
+    }
+}
 
 const ChatPage = () => {
     const [messages, setMessages] = useState<UIMessage[]>([]);
     const [responseMessage, setResponseMessage] = useState<UIMessage | null>(null);
+    const [uiConversation, setUiConversation] = useState<UIConversation | null>(null);
+
     const { id } = useParams();
 
     if (!id) throw new Error("Conversation id is required");
 
     const conversationId = id;
-    const chatService = new ChatService();
 
     const conversationService = new ConversationService();
 
@@ -31,13 +73,9 @@ const ChatPage = () => {
 
     useEffect(() => {
         if (conversation) {
-            const allMessages = conversation.threads.flatMap(thread =>
-                thread.exchanges.flatMap(turn => [
-                    UIMessageFactory.createMessage(turn.userMessage),
-                    UIMessageFactory.createMessage(turn.assistantMessage)
-                ])
-            );
-            setMessages(allMessages);
+
+
+            setUiConversation(mapConversation(conversation));
         }
     }, [conversation]);
 
@@ -69,7 +107,7 @@ const ChatPage = () => {
         var exchangeId = await conversationService.CreateConversationExchange(conversationId);
 
         try {
-            await chatService.sendMessage(
+            await conversationService.startConversationExchange(
                 value,
                 assistantMessage.id,
                 conversationId,
@@ -83,7 +121,10 @@ const ChatPage = () => {
         <>
 
             <div style={{ display: "flex", flexDirection: "column", height: "95vh" }}>
-                <ChatConversation messages={messages} />
+                <Flex>
+                    {uiConversation && <ConversationComponent conversation={uiConversation} />}
+                </Flex>
+
                 <div style={{ width: 700, position: 'sticky', bottom: 0, background: '#fff', zIndex: 10 }}>
                     <ChatInput onEnter={handlePrompt} />
                 </div>

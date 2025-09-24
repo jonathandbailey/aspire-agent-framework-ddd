@@ -1,4 +1,6 @@
 import apiClient from "../../api/client/api-client";
+import type { ChatRequestDto } from "../../types/dto/chat-request.dto";
+import type { ChatResponseDto } from "../../types/dto/chat-response.dto";
 import type { Conversation } from "../../types/models/chat/conversation";
 
 export class ConversationService {
@@ -25,6 +27,15 @@ export class ConversationService {
 
     async CreateConversationExchange(conversationId: string): Promise<string> {
         const response = await apiClient.post<string>(`api/conversations/${conversationId}/exchanges`);
+        return response.data;
+    }
+
+    async startConversationExchange(message: string, id: string, conversationId: string, exchangeId: string): Promise<ChatResponseDto> {
+
+
+        const request: ChatRequestDto = { message, id, conversationId, exchangeId };
+
+        const response = await apiClient.post<ChatResponseDto>('api/chat', request);
         return response.data;
     }
 }
