@@ -37,6 +37,8 @@ public static class InfrastructureExtensions
             azure.AddBlobServiceClient(configuration.GetConnectionString(InfrastructureConstants.BlobStorageConnectionName));
         });
 
+        services.Configure<AzureStorageSettings>((options)=> configuration.GetSection("AzureStorageSettings").Bind(options));
+
         var modelSettings = configuration.GetRequiredSetting<LanguageModelSettings>(InfrastructureConstants.LanguageModelSettingsKey);
 
         services.AddSemanticKernel(modelSettings);

@@ -2,16 +2,17 @@
 using Application.Interfaces;
 using Azure;
 using Azure.Storage.Blobs;
+using Infrastructure.Exceptions;
+using Infrastructure.Settings;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Infrastructure.Exceptions;
 
 namespace Infrastructure.Queries;
 
-public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorageRepository storageRepository, ILogger<ConversationQuery> logger) : IConversationQuery
+public class ConversationQuery(BlobServiceClient blobServiceClient, IOptions<AzureStorageSettings> settings, IAzureStorageRepository storageRepository, ILogger<ConversationQuery> logger) : IConversationQuery
 {
-    private const string BlobContainerName = "user-conversation-history";
   
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -20,6 +21,8 @@ public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorag
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         Converters = { new JsonStringEnumConverter() }
     };
+
+    private readonly AzureStorageSettings _settings = settings.Value;
 
     public async Task<List<ConversationSummaryItem>> GetConversationSummaries(Guid userId)
     {
@@ -30,18 +33,18 @@ public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorag
 
     public async Task<List<Conversation>> GetAllConversationsAsync(Guid userId)
     {
-        var blobContainerClient = blobServiceClient.GetBlobContainerClient(BlobContainerName);
+        var blobContainerClient = blobServiceClient.GetBlobContainerClient(_settings.ConversationBlobContainerName);
         var conversations = new List<Conversation>();
 
-        var prefix = $"user-{userId}/conversations/";
-       
+        var prefix = _settings.ConversationsPrefix.Replace("{userId}", userId.ToString());
+
         try
         {
             await foreach (var blobItem in blobContainerClient.GetBlobsAsync(prefix: prefix))
             {
                 var blobName = blobItem.Name;
                 var serializedConversation =
-                    await storageRepository.DownloadTextBlobAsync(blobName, BlobContainerName);
+                    await storageRepository.DownloadTextBlobAsync(blobName, _settings.ConversationBlobContainerName);
 
                 var conversation =
                     JsonSerializer.Deserialize<Conversation>(serializedConversation, SerializerOptions);
@@ -77,7 +80,7 @@ public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorag
         try
         {
             var serializeChatHistory =
-                await storageRepository.DownloadTextBlobAsync(GetFullBlobName(userId, conversationId), BlobContainerName);
+                await storageRepository.DownloadTextBlobAsync(GetFullBlobName(userId, conversationId), _settings.ConversationBlobContainerName);
 
             var conversation = JsonSerializer.Deserialize<Conversation>(serializeChatHistory, SerializerOptions);
 
@@ -97,8 +100,10 @@ public class ConversationQuery(BlobServiceClient blobServiceClient, IAzureStorag
         }
     }
 
-    private static string GetFullBlobName(Guid userId, Guid conversationId)
+    private string GetFullBlobName(Guid userId, Guid conversationId)
     {
-        return $"user-{userId}/conversations/conversation-{conversationId}.json";
+        return _settings.ConversationBlobNameFormat
+            .Replace("{userId}", userId.ToString())
+            .Replace("{conversationId}", conversationId.ToString());
     }
 }

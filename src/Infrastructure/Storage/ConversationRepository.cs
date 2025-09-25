@@ -4,14 +4,18 @@ using Application.Interfaces;
 using Domain.Conversations;
 using Infrastructure.Dto;
 using Infrastructure.Extensions;
+using Infrastructure.Settings;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 
 namespace Infrastructure.Storage;
 
-public class ConversationRepository(IAzureStorageRepository storageRepository, ILogger<ConversationRepository> logger) : IConversationRepository
+public class ConversationRepository(
+    IAzureStorageRepository storageRepository,
+    IOptions<AzureStorageSettings> settings,
+    ILogger<ConversationRepository> logger) : IConversationRepository
 {
-    private const string BlobContainerName = "user-conversation-history";
     private const string ApplicationJsonContentType = "application/json";
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
@@ -22,6 +26,8 @@ public class ConversationRepository(IAzureStorageRepository storageRepository, I
         Converters = { new JsonStringEnumConverter() }
     };
 
+    private readonly AzureStorageSettings _settings = settings.Value;
+
     public async Task SaveAsync(Conversation conversation)
     {
         Verify.NotNull(conversation);
@@ -30,7 +36,7 @@ public class ConversationRepository(IAzureStorageRepository storageRepository, I
         {
             var serializedConversation = JsonSerializer.Serialize(conversation.Map(), SerializerOptions);
 
-            await storageRepository.UploadTextBlobAsync(GetFullBlobName(conversation.UserId.Value, conversation.Id), BlobContainerName, serializedConversation, ApplicationJsonContentType);
+            await storageRepository.UploadTextBlobAsync(GetFullBlobName(conversation.UserId.Value, conversation.Id), _settings.ConversationBlobContainerName, serializedConversation, ApplicationJsonContentType);
         }
         catch (Exception exception)
         {
@@ -46,7 +52,7 @@ public class ConversationRepository(IAzureStorageRepository storageRepository, I
         try
         {
             var serializeChatHistory =
-                await storageRepository.DownloadTextBlobAsync(GetFullBlobName(userId, conversationId), BlobContainerName);
+                await storageRepository.DownloadTextBlobAsync(GetFullBlobName(userId, conversationId), _settings.ConversationBlobContainerName);
 
             var conversation = JsonSerializer.Deserialize<ConversationDto>(serializeChatHistory, SerializerOptions);
 
@@ -66,8 +72,10 @@ public class ConversationRepository(IAzureStorageRepository storageRepository, I
         }
     }
 
-    private static string GetFullBlobName(Guid userId, Guid conversationId)
+    private string GetFullBlobName(Guid userId, Guid conversationId)
     {
-        return $"user-{userId}/conversations/conversation-{conversationId}.json";
+        return _settings.ConversationBlobNameFormat
+            .Replace("{userId}", userId.ToString())
+            .Replace("{conversationId}", conversationId.ToString());
     }
 }
