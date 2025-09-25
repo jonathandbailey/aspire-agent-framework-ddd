@@ -9,7 +9,7 @@ import streamingService from "../services/chat/streaming.service";
 import NavigationMenu from "../components/layout/NavigationMenu";
 import type { ConversationSummary } from "../types/models/chat/conversationSummary";
 
-const { Content, Sider, Header } = Layout;
+const { Content, Sider } = Layout;
 
 const RootLayout = () => {
     const conversationService = new ConversationService();
@@ -18,7 +18,6 @@ const RootLayout = () => {
         data: conversations = [],
         isLoading: loadingNavigation,
         isError,
-        error
     } = useQuery<ConversationSummary[]>({
         queryKey: ["conversations"],
         queryFn: () => conversationService.LoadConversationSummaries(),
