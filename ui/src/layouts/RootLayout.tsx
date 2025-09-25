@@ -28,8 +28,8 @@ const RootLayout = () => {
 
     const { mutate: createConversation } = useMutation({
         mutationFn: () => conversationService.CreateConversation(),
-        onSuccess: (newConversation: Conversation) => {
-            navigate(`/conversation/${newConversation.id}`);
+        onSuccess: (id: string) => {
+            navigate(`/conversation/${id}`);
         }
     });
 

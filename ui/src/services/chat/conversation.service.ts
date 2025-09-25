@@ -16,8 +16,8 @@ export class ConversationService {
         return response.data;
     }
 
-    async CreateConversation(): Promise<Conversation> {
-        const response = await apiClient.post<Conversation>(`api/conversations`);
+    async CreateConversation(): Promise<string> {
+        const response = await apiClient.post<string>(`api/conversations`);
         return response.data;
     }
 
