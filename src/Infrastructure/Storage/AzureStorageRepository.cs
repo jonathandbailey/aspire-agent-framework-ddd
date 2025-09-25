@@ -55,6 +55,21 @@ public class AzureStorageRepository(BlobServiceClient blobServiceClient, ILogger
         }
     }
 
+    public async Task<bool> ContainerExists(string containerName)
+    {
+        var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+        try
+        {
+            return await blobContainerClient.ExistsAsync();
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, $"Error while checking if {containerName} exists on Azure Storage");
+            throw;
+        }
+    }
+
     public async Task<string> DownloadTextBlobAsync(string blobName, string containerName)
     {
         Verify.NotNullOrWhiteSpace(blobName);
