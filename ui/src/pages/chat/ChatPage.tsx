@@ -139,7 +139,7 @@ const ChatPage = () => {
     return (
         <>
 
-            <div style={{ display: "flex", flexDirection: "column", height: "95vh" }}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
                 <Flex>
                     {uiConversation && <ConversationComponent conversation={uiConversation} />}
                 </Flex>

@@ -2,6 +2,7 @@ import apiClient from "../../api/client/api-client";
 import type { ChatRequestDto } from "../../types/dto/chat-request.dto";
 import type { ChatResponseDto } from "../../types/dto/chat-response.dto";
 import type { Conversation } from "../../types/models/chat/conversation";
+import type { ConversationSummary } from "../../types/models/chat/conversationSummary";
 
 export class ConversationService {
 
@@ -10,13 +11,8 @@ export class ConversationService {
         return response.data;
     }
 
-    async LoadConversations(): Promise<Conversation[]> {
-        const response = await apiClient.get<Conversation[]>(`api/conversations`, {});
-        return response.data;
-    }
-
-    async LoadConversationSummaries(): Promise<Conversation[]> {
-        const response = await apiClient.get<Conversation[]>(`api/conversations`, {});
+    async LoadConversationSummaries(): Promise<ConversationSummary[]> {
+        const response = await apiClient.get<ConversationSummary[]>(`api/conversations/summaries`, {});
         return response.data;
     }
 
@@ -35,7 +31,7 @@ export class ConversationService {
 
         const request: ChatRequestDto = { message, id, conversationId, exchangeId };
 
-        const response = await apiClient.post<ChatResponseDto>('api/chat', request);
+        const response = await apiClient.post<ChatResponseDto>(`api/conversations/${conversationId}/exchanges/${exchangeId}/messages`, request);
         return response.data;
     }
 }

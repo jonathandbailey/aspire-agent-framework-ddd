@@ -28,7 +28,6 @@ var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-app.MapChatApi();
 app.MapConversationApi();
 
 if (app.Environment.IsDevelopment())

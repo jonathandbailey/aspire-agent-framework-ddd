@@ -2,8 +2,8 @@
 using Application.Conversations.Commands;
 using Application.Conversations.Queries;
 using Application.Dto;
-using Application.Extensions;
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api;
@@ -11,46 +11,62 @@ namespace Api;
 public static class ApiMappings
 {
     private const string ApiConversationsRoot = "api/conversations";
-    private const string ApiConversationExchange = "/{conversationId:guid}/exchanges";
-    private const string ApiConversationsPath = "/";
-    private const string ApiConversationSummariesPath = "summaries";
-    private const string ApiChatPath = "api/chat";
-    private const string ApiConversationById = "{conversationId:guid}";
+    private const string CreateConversationPattern = "/";
 
-    public static WebApplication MapChatApi(this WebApplication app)
-    {
-        app.MapPost(ApiChatPath, async ([FromBody] ChatRequestDto requestDto, IMediator mediator, HttpContext context) =>
-        {
-            await mediator.Send(requestDto.Map(context.User.Id()));
- 
-            return Results.Ok();
-        });
-        
-        return app;
-    }
+    private const string GetConversationByIdPattern = "{conversationId:guid}";
+    private const string GetConversationSummaries = "summaries";
+
+    private const string CreateConversationExchangePattern = "/{conversationId:guid}/exchanges";
+    private const string StartConversationExchangePattern = "/{conversationId:guid}/exchanges/{exchangeId:guid}/messages";
+
 
     public static WebApplication MapConversationApi(this WebApplication app)
     {
         var api = app.MapGroup(ApiConversationsRoot);
 
-        api.MapGet(ApiConversationsPath, 
-            async (IMediator mediator, HttpContext context) 
-                => Results.Ok(await mediator.Send(new GetConversationsQuery(context.User.Id()))));
+        api.MapPost(StartConversationExchangePattern, ConversationExchange);
 
-        api.MapGet(ApiConversationSummariesPath,
-            async (IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new GetConversationSummariesQuery(context.User.Id()))));
+        api.MapGet(GetConversationSummaries, ConversationSummaries);
 
+        api.MapGet(GetConversationByIdPattern, GetConversationById);
 
-        api.MapGet(ApiConversationById, 
-            async (Guid conversationId, IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new GetConversationByIdQuery(context.User.Id(), conversationId))));
-
-        api.MapPost(ApiConversationsPath, 
-            async (IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new CreateConversationCommand(context.User.Id()))));
-
-        api.MapPost(ApiConversationExchange,
-            async (Guid conversationId, IMediator mediator, HttpContext context) => Results.Ok(await mediator.Send(new CreateConversationExchangeCommand(context.User.Id(), conversationId))));
-
+        api.MapPost(CreateConversationPattern, CreateConversation);
+        api.MapPost(CreateConversationExchangePattern,CreateConversationExchange);
 
         return app;
+    }
+
+    private static async Task<Created<Guid>> CreateConversation(IMediator mediator, HttpContext context)
+    {
+        var conversationId = await mediator.Send(new CreateConversationCommand(context.User.Id()));
+
+        return TypedResults.Created($"api/conversations/{conversationId}", conversationId);
+    }
+
+    private static async Task<Ok> ConversationExchange(Guid conversationId, Guid exchangeId,
+        [FromBody] ChatRequestDto requestDto, IMediator mediator, HttpContext context)
+    {
+        await mediator.Send(
+            new StartConversationExchangeCommand(requestDto.Message, context.User.Id(), conversationId, exchangeId));
+
+        return TypedResults.Ok();
+    }
+    private static async Task<Ok<List<ConversationSummaryItem>>> ConversationSummaries(IMediator mediator, HttpContext context)
+    {
+        return TypedResults.Ok(await mediator.Send(new GetConversationSummariesQuery(context.User.Id())));
+    }
+
+    private static async Task<Created<Guid>> CreateConversationExchange(Guid conversationId, IMediator mediator,
+        HttpContext context)
+    {
+        var exchangeId =  await mediator.Send(new CreateConversationExchangeCommand(context.User.Id(), conversationId));
+
+        return TypedResults.Created($"api/conversations//{conversationId}/exchanges/{exchangeId}", exchangeId);
+    }
+
+    private static async Task<Ok<Conversation>> GetConversationById(Guid conversationId, IMediator mediator,
+        HttpContext context)
+    {
+        return TypedResults.Ok(await mediator.Send(new GetConversationByIdQuery(context.User.Id(), conversationId)));
     }
 }

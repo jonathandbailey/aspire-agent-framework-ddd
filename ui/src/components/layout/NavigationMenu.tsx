@@ -1,11 +1,11 @@
 import { Menu } from "antd";
 import { Skeleton } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import type { Conversation } from "../../types/models/chat/conversation";
 import { Link } from "react-router-dom";
+import type { ConversationSummary } from "../../types/models/chat/conversationSummary";
 
 interface NavigationMenuProps {
-    conversations: Conversation[];
+    conversations: ConversationSummary[];
     handleAddPlanClick: (e: React.MouseEvent) => void;
     loading: boolean;
 }
@@ -23,11 +23,11 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ conversations, handleAd
                         </div>
                     }
                 >
-                    {conversations?.map((conversation: Conversation) => (
+                    {conversations?.map((conversation: ConversationSummary) => (
                         <Menu.Item key={conversation.id}>
                             <Link to={`/conversation/${conversation.id}`}>
                                 <span style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap", display: "block", width: "24ch" }}>
-                                    {conversation.name}
+                                    {conversation.title}
                                 </span>
                             </Link>
                         </Menu.Item>

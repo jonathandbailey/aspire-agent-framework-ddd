@@ -7,7 +7,7 @@ interface ConversationProps {
 
 const ConversationComponent = ({ conversation }: ConversationProps) => {
     return (
-        <div style={{ flex: 1, overflowY: "auto", padding: "48px", width: 700 }}>
+        <div style={{ padding: "48px", width: 700 }}>
             {conversation.threads.map((thread, idx) => (
                 <ConversationThread key={thread.id ?? idx} thread={thread} />
             ))}
