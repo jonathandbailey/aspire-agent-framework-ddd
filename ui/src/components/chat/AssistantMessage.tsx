@@ -1,4 +1,4 @@
-import { Alert, Card } from "antd";
+import { Alert, Card, Flex, Spin } from "antd";
 import Markdown from "react-markdown";
 import type { UIMessage } from "../../types/ui/UIMessage";
 import styles from "./AssistantMessage.module.css";
@@ -12,7 +12,7 @@ const AssistantMessage = ({ message }: AssistantMessageProps) => {
         <Card
             className={styles["assistant-message-card"]}
             variant="borderless"
-            loading={message.isLoading}
+
         >
             {message.hasError ? (
                 <Alert
@@ -22,7 +22,13 @@ const AssistantMessage = ({ message }: AssistantMessageProps) => {
                     showIcon
                 />
             ) : (
-                <Markdown>{message.text}</Markdown>
+                <Flex vertical>
+                    {message.isLoading && (
+                        <Spin size="small" className={styles["assistant-spin-left"]} />
+                    )}
+                    <Markdown>{message.text}</Markdown>
+                </Flex>
+
             )}
         </Card>
     );

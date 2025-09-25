@@ -9,7 +9,7 @@ type LiveExchangeState = {
     addExchange: (threadId: string, exchange: LiveExchange) => void
     updateExchange: (threadId: string, id: string, patch: Partial<LiveExchange>) => void
     removeExchange: (threadId: string, id: string) => void
-    appendToAssistantMessage: (threadId: string, id: string, text: string) => void
+    appendToAssistantMessage: (threadId: string, id: string, text: string, isLoading: boolean) => void
 }
 
 export const useLiveExchangesStore = create<LiveExchangeState>((set) => ({
@@ -33,7 +33,7 @@ export const useLiveExchangesStore = create<LiveExchangeState>((set) => ({
             },
         })),
 
-    appendToAssistantMessage: (threadId, id, text) =>
+    appendToAssistantMessage: (threadId, id, text, isLoading) =>
         set((state) => {
             const threadExchanges = state.liveExchanges[threadId] ?? []
             return {
@@ -45,7 +45,8 @@ export const useLiveExchangesStore = create<LiveExchangeState>((set) => ({
                             ...e, // new exchange object
                             assistant: {
                                 ...e.assistant, // new message object
-                                text: e.assistant.text + text, // new string
+                                text: e.assistant.text + text,
+                                isLoading: isLoading
                             },
                         }
                     }),
@@ -80,7 +81,7 @@ export function useLiveExchanges(threadId: string) {
         updateExchange: (id: string, patch: Partial<LiveExchange>) =>
             updateExchange(threadId, id, patch),
         removeExchange: (id: string) => removeExchange(threadId, id),
-        appendToAssistantMessage: (id: string, text: string) =>
-            appendToAssistantMessage(threadId, id, text),
+        appendToAssistantMessage: (id: string, text: string, isLoading: boolean) =>
+            appendToAssistantMessage(threadId, id, text, isLoading),
     }
 }
