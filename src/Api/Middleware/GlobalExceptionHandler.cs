@@ -39,6 +39,13 @@ public class GlobalExceptionHandler : IMiddleware, IExceptionHandler
                 Status = StatusCodes.Status500InternalServerError,
                 Detail = "The application is currently unable to access conversation data. Please try again later."
             },
+            ConversationInfrastructureException => new ProblemDetails
+            {
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+                Title = "Application Error",
+                Status = StatusCodes.Status500InternalServerError,
+                Detail = "The current conversation cannot be processed."
+            },
 
             InfrastructureException => new ProblemDetails
             {
