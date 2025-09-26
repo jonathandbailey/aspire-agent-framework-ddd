@@ -21,3 +21,4 @@
 /src/Application/obj
 /Domain.Tests/bin/Debug/net9.0
 /Domain.Tests/obj
+/SemanticKernel.sln.DotSettings.user
