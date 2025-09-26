@@ -1,4 +1,7 @@
-# Semantic Kernel
+# Semantic Kernel Agents
+
+[![.NET](https://github.com/jonathandbailey/the-infinite-loop-semantic-kernel/actions/workflows/dotnet.yml/badge.svg)](https://github.com/jonathandbailey/the-infinite-loop-semantic-kernel/actions/workflows/dotnet.yml)
+
 This is the application and code sample for a blog series : [Semantic Kernel, Part 1 : Beyond the Console App](https://www.theinfiniteloop.dev/semantic-kernel-part-1-beyond-the-console-app/)
 
 I wanted to move beyond the console apps I've built with Semantic Kernel, and build more scalable, flexible applications I can deploy on Azure. 
