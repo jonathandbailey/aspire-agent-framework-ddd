@@ -10,57 +10,57 @@ public class Conversation : Entity
 
     private readonly List<ConversationThread> _threads = [];
 
+    private readonly ConversationThread _activeThread;
+
     public IReadOnlyCollection<ConversationThread> Threads => _threads;
    
     public UserId UserId { get; }
 
     public Conversation(UserId userId)
     {
-        Id = Guid.NewGuid();
+        Id = userId.Value;
         Name = string.Empty;
         UserId = userId;
-        CreateNewThread();
+        _activeThread = CreateNewThread();
     }
 
     public Conversation(Guid id, UserId userId, string name, List<ConversationThread> threads)
     {
+        Verify.NotNull(id);
+        Verify.NotNull(name);
+        Verify.NotNull(threads);
+        
         Id = id;
         UserId = userId;
         Name = name;
         _threads = threads;
+
+        if (threads.Count == 0)
+            throw new ArgumentException("threads collection must contain at least one ConversationThread.");
+
+        _activeThread = threads.Last();
     }
 
     public ExchangeId CreateConversationExchange()
     {
-        var thread = GetCurrentThread();
-
-        return thread.CreateConversationExchange();
+        return _activeThread.CreateConversationExchange();
     }
 
     public ExchangeId StartConversationExchange(string content, ExchangeId exchangeId)
     {
-        var thread = GetCurrentThread();
-
-        return thread.StartConversationExchange(content, exchangeId);
+        return _activeThread.StartConversationExchange(content, exchangeId);
     }
 
     public void CompleteConversationExchange(ExchangeId exchangeId, string content)
     {
-        var thread = GetCurrentThread();
-
-        thread.CompleteConversationExchange(exchangeId, content);
+        _activeThread.CompleteConversationExchange(exchangeId, content);
 
         AddDomainEvent(new ConversationTurnEndedEvent(UserId, Id));
     }
 
     public string GetConversationSummaryForTitleGeneration()
     {
-        var thread = Threads.FirstOrDefault();
-
-        if (thread == null)
-        {
-            throw new InvalidOperationException($"Conversation {Id} doesn't have any threads");
-        }
+        var thread = _activeThread;
 
         if (thread.Exchanges.Count == 0)
         {
@@ -78,11 +78,13 @@ public class Conversation : Entity
         return stringBuilder.ToString();
     }
 
-    private void CreateNewThread()
+    private ConversationThread CreateNewThread()
     {
         var conversationThread = new ConversationThread(_threads.Count);
-
+   
         _threads.Add(conversationThread);
+
+        return conversationThread;
     }
 
     public void UpdateTitle(string title)
@@ -90,10 +92,5 @@ public class Conversation : Entity
         Name = title;
 
         AddDomainEvent(new ConversationTitleUpdatedEvent(UserId, Id, Name));
-    }
-
-    private ConversationThread GetCurrentThread()
-    {
-        return Threads.Last();
     }
 }
