@@ -2,5 +2,5 @@ namespace Application.Dto;
 
 public class AssistantResponseDto
 {
-    public string Content { get; set; }
+    public required string Content { get; init; }
 }
