@@ -4,11 +4,11 @@ using MediatR;
 
 namespace Application.Conversations.Queries;
 
-public class GetConversations(IConversationQuery conversationQuery) : IRequestHandler<GetConversationsQuery, List<Conversation>>
+public class GetConversations(IConversationQueries conversationQueries) : IRequestHandler<GetConversationsQuery, List<Conversation>>
 {
     public async Task<List<Conversation>> Handle(GetConversationsQuery request, CancellationToken cancellationToken)
     {
-        return await conversationQuery.GetAllConversationsAsync(request.UserId);
+        return await conversationQueries.GetAllConversationsAsync(request.UserId);
     }
 }
 

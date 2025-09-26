@@ -11,7 +11,7 @@ using System.Text.Json.Serialization;
 
 namespace Infrastructure.Queries;
 
-public class ConversationQuery(BlobServiceClient blobServiceClient, IOptions<AzureStorageSettings> settings, IAzureStorageRepository storageRepository, ILogger<ConversationQuery> logger) : IConversationQuery
+public class ConversationQuerieses(BlobServiceClient blobServiceClient, IOptions<AzureStorageSettings> settings, IAzureStorageRepository storageRepository, ILogger<ConversationQuerieses> logger) : IConversationQueries
 {
   
     private static readonly JsonSerializerOptions SerializerOptions = new()

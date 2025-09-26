@@ -30,7 +30,7 @@ public static class InfrastructureExtensions
 
         services.AddScoped<IAssistantMemory, DefaultMemoryStrategy>();
         services.AddScoped<IAssistantFactory, AssistantFactory>();
-        services.AddScoped<IConversationQuery, ConversationQuery>();
+        services.AddScoped<IConversationQueries, ConversationQuerieses>();
 
         services.AddAzureClients(azure =>
         {
