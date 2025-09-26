@@ -28,7 +28,7 @@ public class GlobalExceptionHandler : IMiddleware, IExceptionHandler
     }
 
 
-    private static ProblemDetails CreateProblemDetails(Exception exception, HttpContext context)
+    private static ProblemDetails CreateProblemDetails(Exception exception)
     {
         return exception switch
         {
@@ -90,7 +90,7 @@ public class GlobalExceptionHandler : IMiddleware, IExceptionHandler
   
     private static async Task Handle(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        var problemDetails = CreateProblemDetails(exception, httpContext);
+        var problemDetails = CreateProblemDetails(exception);
 
         httpContext.Response.ContentType = "application/problem+json";
         httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;

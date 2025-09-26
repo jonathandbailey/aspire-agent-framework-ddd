@@ -1,4 +1,5 @@
 ﻿using Domain.Common;
+using Domain.Exceptions;
 
 namespace Domain.Conversations;
 
@@ -17,6 +18,9 @@ public class ConversationThread : Entity
 
     public ConversationThread(Guid id, int index, List<ConversationExchange> exchanges)
     {
+        Verify.NotEmpty(id);
+        Verify.NotNull(exchanges);
+        
         Id = id;
         Index = index;
         _exchanges = exchanges;
@@ -24,8 +28,11 @@ public class ConversationThread : Entity
 
     public ExchangeId StartConversationExchange(string content, ExchangeId exchangeId)
     {
-        var exchange = _exchanges.First(x => Equals(x.ExchangeId, exchangeId));
-        
+        var exchange = _exchanges.FirstOrDefault(x => Equals(x.ExchangeId, exchangeId));
+
+        if (exchange == null)
+            throw new ExchangeNotFoundDomainException($"Conversation Exchange {exchangeId.Value} does not exist.");
+
         exchange.UserMessage.Update(content);
 
         return exchange.ExchangeId;
@@ -42,7 +49,10 @@ public class ConversationThread : Entity
 
     public void CompleteConversationExchange(ExchangeId exchangeId, string content)
     {
-        var exchange = _exchanges.First(x => Equals(x.ExchangeId, exchangeId));
+        var exchange = _exchanges.FirstOrDefault(x => Equals(x.ExchangeId, exchangeId));
+
+        if (exchange == null)
+            throw new ExchangeNotFoundDomainException($"Conversation Exchange {exchangeId.Value} does not exist.");
 
         exchange.AssistantMessage.Update(content);
     }
