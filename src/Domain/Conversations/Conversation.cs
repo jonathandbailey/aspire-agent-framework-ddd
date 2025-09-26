@@ -46,9 +46,9 @@ public class Conversation : Entity
         return _activeThread.CreateConversationExchange();
     }
 
-    public ExchangeId StartConversationExchange(string content, ExchangeId exchangeId)
+    public void StartConversationExchange(string content, ExchangeId exchangeId)
     {
-        return _activeThread.StartConversationExchange(content, exchangeId);
+        _activeThread.StartConversationExchange(content, exchangeId);
     }
 
     public void CompleteConversationExchange(ExchangeId exchangeId, string content)
