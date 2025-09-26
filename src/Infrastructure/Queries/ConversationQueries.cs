@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Infrastructure.Extensions;
 
 namespace Infrastructure.Queries;
 
@@ -80,7 +81,7 @@ public class ConversationQuerieses(BlobServiceClient blobServiceClient, IOptions
         try
         {
             var serializeChatHistory =
-                await storageRepository.DownloadTextBlobAsync(GetFullBlobName(userId, conversationId), _settings.ConversationBlobContainerName);
+                await storageRepository.DownloadTextBlobAsync(_settings.GetConversationBlobPath(userId, conversationId), _settings.ConversationBlobContainerName);
 
             var conversation = JsonSerializer.Deserialize<Conversation>(serializeChatHistory, SerializerOptions);
 
@@ -98,12 +99,5 @@ public class ConversationQuerieses(BlobServiceClient blobServiceClient, IOptions
             logger.LogError(exception, "An exception has occurred while trying to Load the Agent Chat History, {threadId}", conversationId);
             throw new InfrastructureException("Infrastructure services are not available.", exception);
         }
-    }
-
-    private string GetFullBlobName(Guid userId, Guid conversationId)
-    {
-        return _settings.ConversationBlobNameFormat
-            .Replace("{userId}", userId.ToString())
-            .Replace("{conversationId}", conversationId.ToString());
     }
 }

@@ -3,11 +3,11 @@ using System.Text.Json.Serialization;
 using Application.Interfaces;
 using Domain.Conversations;
 using Infrastructure.Dto;
+using Infrastructure.Exceptions;
 using Infrastructure.Extensions;
 using Infrastructure.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
 
 namespace Infrastructure.Storage;
 
@@ -31,28 +31,44 @@ public class ConversationRepository(
     public async Task SaveAsync(Conversation conversation)
     {
         Verify.NotNull(conversation);
-
+        Verify.NotNull(conversation.UserId);
+      
         try
         {
             var serializedConversation = JsonSerializer.Serialize(conversation.Map(), SerializerOptions);
 
-            await storageRepository.UploadTextBlobAsync(GetFullBlobName(conversation.UserId.Value, conversation.Id), _settings.ConversationBlobContainerName, serializedConversation, ApplicationJsonContentType);
+            await storageRepository.UploadTextBlobAsync(_settings.GetConversationBlobPath(conversation.UserId.Value, conversation.Id),
+                _settings.ConversationBlobContainerName, serializedConversation, ApplicationJsonContentType);
+        }
+        catch (JsonException exception)
+        {
+            var ex = new ConversationInfrastructureException(
+                $"Failed to serialize conversation {conversation.Id} for user {conversation.UserId.Value}", exception);
+
+            logger.LogError(ex, "Failed to serialize conversation {ConversationId} for user {UserId}", conversation.Id, conversation.UserId.Value);
+
+            throw ex;
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "An exception has occurred while trying to Save the Agent Chat History , {Id}", conversation.Id);
-            throw;
+            var ex = new ConversationInfrastructureException(
+                $"Error while trying to save conversation {conversation.Id} for user {conversation.UserId.Value}", exception);
+
+            logger.LogError(ex, "Error while trying to save conversation {ConversationId} for user {UserId}", conversation.Id, conversation.UserId.Value);
+
+            throw ex;
         }
     }
 
     public async Task<Conversation> LoadAsync(Guid userId, Guid conversationId)
     {
-        Verify.NotNull(conversationId);
+        Verify.NotEmpty(conversationId);
+        Verify.NotEmpty(userId);
 
         try
         {
             var serializeChatHistory =
-                await storageRepository.DownloadTextBlobAsync(GetFullBlobName(userId, conversationId), _settings.ConversationBlobContainerName);
+                await storageRepository.DownloadTextBlobAsync(_settings.GetConversationBlobPath(userId, conversationId), _settings.ConversationBlobContainerName);
 
             var conversation = JsonSerializer.Deserialize<ConversationDto>(serializeChatHistory, SerializerOptions);
 
@@ -60,22 +76,17 @@ public class ConversationRepository(
 
             return conversation.Map();
         }
-        catch (JsonException jsonEx)
+        catch (JsonException exception)
         {
-            logger.LogError(jsonEx, "Failed to deserialize chat history for thread {threadId}", conversationId);
-            throw;
+            var ex = new ConversationInfrastructureException($"Failed to deserialize conversation {conversationId} for user {userId}", exception);
+            logger.LogError(ex, "Failed to deserialize conversation {ConversationId} for user {UserId}", conversationId, userId);
+            throw ex;
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "An exception has occurred while trying to Load the Agent Chat History, {threadId}", conversationId);
-            throw;
+            var ex = new ConversationInfrastructureException($"Error trying to load conversation {conversationId} for user {userId}", exception);
+            logger.LogError(ex, "Error trying to load conversation {ConversationId} for user {UserId}", conversationId, userId);
+            throw ex;
         }
-    }
-
-    private string GetFullBlobName(Guid userId, Guid conversationId)
-    {
-        return _settings.ConversationBlobNameFormat
-            .Replace("{userId}", userId.ToString())
-            .Replace("{conversationId}", conversationId.ToString());
     }
 }
