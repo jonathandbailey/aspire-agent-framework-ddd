@@ -1,35 +1,33 @@
+import { useMemo } from "react";
 import { Button, Flex, Layout, Result } from "antd";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Conversation } from "../types/models/chat/conversation";
-import { ConversationService } from "../services/chat/conversation.service";
+import { useMutation } from "@tanstack/react-query";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import ChatPage from "../pages/chat/ChatPage";
-import { Route, Routes } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import streamingService from "../services/chat/streaming.service";
 import NavigationMenu from "../components/layout/NavigationMenu";
+import { ConversationService } from "../services/chat/conversation.service";
+import { useConversationSummaries } from "../hooks/useConversationSummaries";
+import { useCommandStreamHandler } from "../hooks/useCommandStreamHandler";
 import type { ConversationSummary } from "../types/models/chat/conversationSummary";
+import styles from "./RootLayout.module.css";
 
 const { Content, Sider } = Layout;
 
 const RootLayout = () => {
-    const conversationService = new ConversationService();
-    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    const conversationService = useMemo(() => new ConversationService(), []);
     const {
-        data: conversations = [],
+        data: conversations = [] as ConversationSummary[],
         isLoading: loadingNavigation,
         isError,
-    } = useQuery<ConversationSummary[]>({
-        queryKey: ["conversations"],
-        queryFn: () => conversationService.LoadConversationSummaries(),
-        retry: false,
-    });
-    const navigate = useNavigate();
+    } = useConversationSummaries();
+
+    useCommandStreamHandler();
 
     const { mutate: createConversation } = useMutation({
         mutationFn: () => conversationService.CreateConversation(),
         onSuccess: (id: string) => {
             navigate(`/conversation/${id}`);
-        }
+        },
     });
 
     const handleAddPlanClick = (e: React.MouseEvent) => {
@@ -37,56 +35,41 @@ const RootLayout = () => {
         createConversation();
     };
 
-    streamingService.on("command", ({ conversationId, title }) => {
-        queryClient.setQueryData(["conversations"], (oldConversations: Conversation[] = []) =>
-            oldConversations.map(convo =>
-                convo.id === conversationId ? { ...convo, name: title } : convo
-            )
-        );
-        queryClient.invalidateQueries({ queryKey: ["conversations"] });
-    });
-
     if (isError) {
-        return <Result
-            status="500"
-            title="500"
-            subTitle="Sorry, something went wrong."
-            extra={<Button type="primary">Back Home</Button>}
-        />
+        return (
+            <Result
+                status="500"
+                title="500"
+                subTitle="Sorry, something went wrong."
+                extra={<Button type="primary">Back Home</Button>}
+            />
+        );
     }
 
     return (
-        <>
-
-            <Flex vertical gap="middle">
-                <Layout hasSider style={{ backgroundColor: "white" }}>
-
-                    <Sider
-                        breakpoint="lg"
-                        style={{
-                            margin: "0px",
-                            height: "100vh",
-                            position: "sticky",
-                            top: 0,
-                            scrollbarWidth: "thin",
-                            scrollbarGutter: "stable"
-                        }}
-                        width={250}
-                        theme="light" >
-                        <NavigationMenu conversations={conversations} handleAddPlanClick={handleAddPlanClick} loading={loadingNavigation} />
-                    </Sider>
-                    <Layout style={{ minHeight: 0, width: "100%" }}>
-                        <Content style={{ minHeight: 0, backgroundColor: "white", overflow: 'initial' }} >
-                            <Routes>
-                                <Route path="/conversation/:id" element={<ChatPage />} />
-                            </Routes>
-                        </Content>
-                    </Layout>
+        <Flex vertical gap="middle">
+            <Layout hasSider className={styles.layout}>
+                <Sider
+                    breakpoint="lg"
+                    className={styles.sider}
+                    width={250}
+                    theme="light"
+                >
+                    <NavigationMenu
+                        conversations={conversations}
+                        handleAddPlanClick={handleAddPlanClick}
+                        loading={loadingNavigation}
+                    />
+                </Sider>
+                <Layout className={styles.innerLayout}>
+                    <Content className={styles.content}>
+                        <Routes>
+                            <Route path="/conversation/:id" element={<ChatPage />} />
+                        </Routes>
+                    </Content>
                 </Layout>
-            </Flex>
-
-        </>
-
+            </Layout>
+        </Flex>
     );
 };
 

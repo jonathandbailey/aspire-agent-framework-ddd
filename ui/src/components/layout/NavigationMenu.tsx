@@ -10,7 +10,7 @@ interface NavigationMenuProps {
     loading: boolean;
 }
 
-const NavigationMenu: React.FC<NavigationMenuProps> = ({ conversations, handleAddPlanClick, loading }) => {
+const NavigationMenu = ({ conversations, handleAddPlanClick, loading }: NavigationMenuProps) => {
     return (
         <Skeleton active loading={!!loading} style={{ padding: "16px" }}>
             <Menu style={{ paddingTop: "32px", paddingLeft: "8px" }}>

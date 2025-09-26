@@ -28,6 +28,19 @@ class SignalRService {
         }
     }
 
+    off(event: string, callback?: CallbackFn): void {
+        if (this.connection) {
+            if (callback) {
+                this.connection.off(event, callback);
+            } else {
+                this.connection.off(event);
+            }
+        }
+        if (!callback) {
+            delete this.handlers[event];
+        }
+    }
+
     stop(): void {
         if (this.connection) {
             this.connection.stop();

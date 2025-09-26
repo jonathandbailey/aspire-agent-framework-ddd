@@ -1,0 +1,23 @@
+.layout {
+    background-color: white;
+}
+
+.sider {
+    margin: 0px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+}
+
+.innerLayout {
+    min-height: 0;
+    width: 100%;
+}
+
+.content {
+    min-height: 0;
+    background-color: white;
+    overflow: initial;
+}
