@@ -13,30 +13,26 @@ const ConversationThread = ({ thread }: ConversationThreadProps) => {
         useLiveExchanges(thread.id)
     return (
         <>
-            <div>
-                {thread.exchanges.map((exchange, idx) => (
-                    <div key={idx}>
-                        <Flex justify="flex-end" style={{ width: "100%" }}>
-                            <div><UserMessage message={exchange.user} /></div>
-                        </Flex>
+            {thread.exchanges.map((exchange, idx) => (
+                <div key={idx}>
+                    <Flex justify="flex-end" style={{ width: "100%" }}>
+                        <UserMessage message={exchange.user} />
+                    </Flex>
 
 
-                        <div><AssistantMessage message={exchange.assistant} /></div>
-                    </div>
-                ))}
-            </div>
-            <div>
-                {liveExchanges.map((exchange, idx) => (
-                    <div key={idx}>
-                        <Flex justify="flex-end" style={{ width: "100%" }}>
-                            <div><UserMessage message={exchange.user} /></div>
-                        </Flex>
-                        <div><AssistantMessage message={exchange.assistant} /></div>
-                    </div>
+                    <AssistantMessage message={exchange.assistant} />
+                </div>
+            ))}
+            {liveExchanges.map((exchange, idx) => (
+                <div key={idx}>
+                    <Flex justify="flex-end" style={{ width: "100%" }}>
+                        <div><UserMessage message={exchange.user} /></div>
+                    </Flex>
+                    <div><AssistantMessage message={exchange.assistant} /></div>
+                </div>
 
 
-                ))}
-            </div>
+            ))}
 
 
 

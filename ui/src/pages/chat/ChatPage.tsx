@@ -60,13 +60,14 @@ const ChatPage = () => {
 
     return (
         <>
-            <Flex vertical>
+            <Flex vertical >
                 {conversation && <ConversationComponent conversation={conversation} />}
 
                 <div style={{ width: 700, position: 'sticky', bottom: 0, background: '#fff', zIndex: 10 }}>
                     <ChatInput onEnter={handlePrompt} />
                 </div>
             </Flex>
+
         </>
     );
 };

@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { Button, Flex, Layout, Result } from "antd";
+﻿import { useMemo } from "react";
+import { Button, Flex, Layout, Result, Spin } from "antd";
 import { useMutation } from "@tanstack/react-query";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import ChatPage from "../pages/chat/ChatPage";
@@ -35,41 +35,52 @@ const RootLayout = () => {
         createConversation();
     };
 
+    if (loadingNavigation) {
+        return (
+            <Flex justify="center" align="center" style={{ height: "100vh", width: "100vw" }}>
+                <Spin size="large"></Spin>
+                <div style={{ marginLeft: 16 }}>Loading conversations...</div>
+            </Flex>
+        );
+    }
+
     if (isError) {
         return (
-            <Result
-                status="500"
-                title="500"
-                subTitle="Sorry, something went wrong."
-                extra={<Button type="primary">Back Home</Button>}
-            />
+            <Flex justify="center" align="center" style={{ height: "100vh", width: "100vw" }}>
+                <Result
+                    status="500"
+                    title="Services Unavailable"
+                    subTitle="Sorry, we are not able to load conversations at this time."
+                />
+            </Flex>
+
         );
     }
 
     return (
-        <Flex vertical gap="middle">
-            <Layout hasSider className={styles.layout}>
-                <Sider
-                    breakpoint="lg"
-                    className={styles.sider}
-                    width={250}
-                    theme="light"
-                >
-                    <NavigationMenu
-                        conversations={conversations}
-                        handleAddPlanClick={handleAddPlanClick}
-                        loading={loadingNavigation}
-                    />
-                </Sider>
-                <Layout className={styles.innerLayout}>
-                    <Content className={styles.content}>
-                        <Routes>
-                            <Route path="/conversation/:id" element={<ChatPage />} />
-                        </Routes>
-                    </Content>
-                </Layout>
+
+        <Layout hasSider className={styles.layout}>
+            <Sider
+                breakpoint="lg"
+                className={styles.sider}
+                width={250}
+                theme="light"
+            >
+                <NavigationMenu
+                    conversations={conversations}
+                    handleAddPlanClick={handleAddPlanClick}
+                    loading={loadingNavigation}
+                />
+            </Sider>
+            <Layout className={styles.innerLayout}>
+                <Content className={styles.content}>
+                    <Routes>
+                        <Route path="/conversation/:id" element={<ChatPage />} />
+                    </Routes>
+                </Content>
             </Layout>
-        </Flex>
+        </Layout>
+
     );
 };
 
