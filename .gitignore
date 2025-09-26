@@ -19,3 +19,5 @@
 /src/Storage/Data
 /src/Domain/obj
 /src/Application/obj
+/Domain.Tests/bin/Debug/net9.0
+/Domain.Tests/obj
