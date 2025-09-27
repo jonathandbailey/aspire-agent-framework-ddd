@@ -1,10 +1,11 @@
 ﻿using Application.Interfaces;
 using Domain.Events;
+using Domain.Interfaces;
 using MediatR;
 
 namespace Application.Conversations.Events;
 
-public class AssistantMessageAddedHandler(IConversationRepository conversationRepository,
+public class AssistantMessageAddedHandler(IConversationRepository conversationRepository, IConversationDomainService conversationDomainService,
     IAssistantFactory assistantFactory) : INotificationHandler<ConversationTurnEndedEvent>
 {
     public async Task Handle(ConversationTurnEndedEvent request, CancellationToken cancellationToken)
@@ -15,7 +16,7 @@ public class AssistantMessageAddedHandler(IConversationRepository conversationRe
         {
             var titleAssistant = await assistantFactory.CreateTitleAssistant();
 
-            var threadSummary = conversation.GetConversationSummaryForTitleGeneration();
+            var threadSummary = conversationDomainService.GetConversationSummary(conversation);
         
             var response = await titleAssistant.InvokeAsync(threadSummary);
           

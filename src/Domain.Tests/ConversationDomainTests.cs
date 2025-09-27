@@ -47,15 +47,6 @@ namespace Domain.Tests
         }
 
         [Fact]
-        public void GetConversationSummaryForTitleGeneration_WithNoExchanges_ThrowsInvalidOperationException()
-        {
-            var userId = UserId.New();
-            var conversation = new Conversation(userId);
-
-            Assert.Throws<InvalidOperationException>(() => conversation.GetConversationSummaryForTitleGeneration());
-        }
-
-        [Fact]
         public void UpdateTitle_SetsNameAndAddsEvent()
         {
             var userId = UserId.New();
