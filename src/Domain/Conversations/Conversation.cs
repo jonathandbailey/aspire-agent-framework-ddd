@@ -17,7 +17,7 @@ public class Conversation : Entity
 
     public Conversation(UserId userId)
     {
-        Id = userId.Value;
+        Id = Guid.NewGuid();
         Name = string.Empty;
         UserId = userId;
         _activeThread = CreateNewThread();
