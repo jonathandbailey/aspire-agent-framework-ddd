@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces;
 using Infrastructure.Adapters;
-using Infrastructure.Assistants;
+using Infrastructure.Agents;
 using Infrastructure.Queries;
 using Infrastructure.Settings;
 using Infrastructure.Storage;
@@ -27,7 +27,7 @@ public static class InfrastructureExtensions
         });
 
 
-        services.AddScoped<IAssistantFactory, AssistantFactory>();
+        services.AddScoped<IAgentFactory, AgentFactory>();
         services.AddScoped<IConversationQueries, ConversationQuerieses>();
 
         services.AddAzureClients(azure =>

@@ -8,7 +8,7 @@ using MediatR;
 namespace Application.Conversations.Commands;
 
 public class StartConversationExchangeCommandHandler(IConversationRepository conversationRepository,
-    IAssistantFactory assistantFactory, 
+    IAgentFactory agentFactory, 
     IConversationDomainService conversationDomainService,
         IStreamingEventPublisher publisher
     ) : IRequestHandler<StartConversationExchangeCommand>
@@ -21,7 +21,7 @@ public class StartConversationExchangeCommandHandler(IConversationRepository con
 
         await conversationRepository.SaveAsync(conversation);
 
-        var assistant = await assistantFactory.CreateConversationAgent();
+        var assistant = await agentFactory.CreateAgent("Conversation");
 
         var messages = conversationDomainService.GetMessages(conversation);
 

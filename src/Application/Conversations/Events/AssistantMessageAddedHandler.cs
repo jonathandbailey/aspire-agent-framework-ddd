@@ -6,7 +6,7 @@ using MediatR;
 namespace Application.Conversations.Events;
 
 public class AssistantMessageAddedHandler(IConversationRepository conversationRepository, IConversationDomainService conversationDomainService,
-    IAssistantFactory assistantFactory) : INotificationHandler<ConversationTurnEndedEvent>
+    IAgentFactory agentFactory) : INotificationHandler<ConversationTurnEndedEvent>
 {
     public async Task Handle(ConversationTurnEndedEvent request, CancellationToken cancellationToken)
     {
@@ -14,7 +14,7 @@ public class AssistantMessageAddedHandler(IConversationRepository conversationRe
 
         if (string.IsNullOrWhiteSpace(conversation.Name))
         {
-            var titleAssistant = await assistantFactory.CreateTitleAssistant();
+            var titleAssistant = await agentFactory.CreateTitleAssistant();
 
             var threadSummary = conversationDomainService.GetConversationSummary(conversation);
         

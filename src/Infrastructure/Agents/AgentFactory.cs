@@ -1,33 +1,38 @@
 ﻿using Application.Interfaces;
-using Infrastructure.Agents;
+using Infrastructure.Assistants;
+using Infrastructure.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using Agent = Infrastructure.Agents.Agent;
 
 
-namespace Infrastructure.Assistants;
+namespace Infrastructure.Agents;
 
 /// <summary>
 /// Factory class responsible for creating instances of <see cref="ChatCompletionAgent"/>.
 /// </summary>
-public class AssistantFactory(IAzureStorageRepository storageRepository, Kernel kernel, ILogger<AssistantFactory> logger) : IAssistantFactory
+public class AgentFactory(IAzureStorageRepository storageRepository, Kernel kernel, ILogger<AgentFactory> logger) : IAgentFactory
 {
+
+    private readonly List<AgentSettings> _agentSettings = [ new AgentSettings { Name = "Conversation", PromptTemplateName = "chat-assistant.yaml" }];
+    
+    
     /// <summary>
     /// Creates an instance of <see cref="ChatCompletionAgent"/> using the agent template fetched from Azure Storage.
     /// </summary>
     /// <returns>A configured instance of <see cref="ChatCompletionAgent"/>.</returns>
     /// <exception cref="InvalidOperationException">Thrown when the downloaded agent template is empty or invalid.</exception>
     /// <exception cref="Exception">Thrown when there is an error downloading the agent template.</exception>
-
-    public async Task<IAgent> CreateConversationAgent()
+    public async Task<IAgent> CreateAgent(string name)
     {
         string agentTemplate;
 
+        var agentSettings = _agentSettings.First(x => x.Name == name);
+        
         try
         {
-            agentTemplate = await storageRepository.DownloadTextBlobAsync(InfrastructureConstants.ChatAgentTemplateName, InfrastructureConstants.AgentTemplatesContainerName);
+            agentTemplate = await storageRepository.DownloadTextBlobAsync(agentSettings.PromptTemplateName, InfrastructureConstants.AgentTemplatesContainerName);
 
         }
         catch (Exception exception)

@@ -1,9 +1,9 @@
 ﻿
 namespace Application.Interfaces;
 
-public interface IAssistantFactory
+public interface IAgentFactory
 {
     Task<ITitleAssistant> CreateTitleAssistant();
 
-    Task<IAgent> CreateConversationAgent();
+    Task<IAgent> CreateAgent(string name);
 }
