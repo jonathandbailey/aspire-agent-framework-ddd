@@ -1,16 +1,13 @@
-﻿using Application.Dto;
-using Application.Interfaces;
-using Domain.Conversations;
+﻿using Domain.Conversations;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
 
-namespace Infrastructure.Agents;
+namespace Infrastructure.Extensions;
 
-public class ConversationAgent(IStreamingAgent agent) : IConversationAgent
+public static class AgentExtensions
 {
-    public async IAsyncEnumerable<AssistantResponseDto> InvokeStreamAsync(
-        List<Message> messages)
+    public static ChatHistoryAgentThread ToChatHistoryThread(this List<Message> messages)
     {
         var thread = new ChatHistoryAgentThread();
 
@@ -26,10 +23,7 @@ public class ConversationAgent(IStreamingAgent agent) : IConversationAgent
                 thread.ChatHistory.Add(new ChatMessageContent(AuthorRole.Assistant, message.Content));
             }
         }
-        
-        await foreach (var response in agent.InvokeStreamAsync(thread))
-        {
-            yield return new AssistantResponseDto { Content = response.Message.Content!};
-        }
+
+        return thread;
     }
 }

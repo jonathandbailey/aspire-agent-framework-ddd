@@ -1,17 +1,18 @@
 ﻿using Application.Interfaces;
 using Infrastructure.Agents;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Agent = Infrastructure.Agents.Agent;
+
 
 namespace Infrastructure.Assistants;
 
 /// <summary>
 /// Factory class responsible for creating instances of <see cref="ChatCompletionAgent"/>.
 /// </summary>
-public class AssistantFactory(IAzureStorageRepository storageRepository, Kernel kernel, IStreamingEventPublisher publisher, ILogger<AssistantFactory> logger) : IAssistantFactory
+public class AssistantFactory(IAzureStorageRepository storageRepository, Kernel kernel, ILogger<AssistantFactory> logger) : IAssistantFactory
 {
     /// <summary>
     /// Creates an instance of <see cref="ChatCompletionAgent"/> using the agent template fetched from Azure Storage.
@@ -20,7 +21,7 @@ public class AssistantFactory(IAzureStorageRepository storageRepository, Kernel 
     /// <exception cref="InvalidOperationException">Thrown when the downloaded agent template is empty or invalid.</exception>
     /// <exception cref="Exception">Thrown when there is an error downloading the agent template.</exception>
 
-    public async Task<IConversationAgent> CreateConversationAgent()
+    public async Task<IAgent> CreateConversationAgent()
     {
         string agentTemplate;
 
@@ -53,45 +54,9 @@ public class AssistantFactory(IAzureStorageRepository storageRepository, Kernel 
             Arguments = new KernelArguments(promptExecutionSettings)
         };
 
-        var streamingAgent = new StreamingAgent(agent);
+        var streamingAgent = new BaseStreamingAgent(agent);
 
-        return new ConversationAgent(streamingAgent);
-    }
-    
-    public async Task<IConversationAssistant> CreateConversationAssistant()
-    {
-        string agentTemplate;
-        
-        try
-        {
-            agentTemplate = await storageRepository.DownloadTextBlobAsync(InfrastructureConstants.ChatAgentTemplateName, InfrastructureConstants.AgentTemplatesContainerName);
-
-        }
-        catch (Exception exception)
-        {
-            logger.LogError(exception, "Failed to load agent template : {ChatAgentTemplateName}", InfrastructureConstants.ChatAgentTemplateName);
-            throw;
-        }
-
-        if (string.IsNullOrWhiteSpace(agentTemplate))
-        {
-            throw new InvalidOperationException($"The downloaded agent template is empty or invalid : {InfrastructureConstants.ChatAgentTemplateName}");
-        }
-
-        var templateConfig = KernelFunctionYaml.ToPromptTemplateConfig(agentTemplate);
-
-        var promptExecutionSettings = new OpenAIPromptExecutionSettings
-        {
-            ServiceId = InfrastructureConstants.ChatAgentModeServiceId
-        };
-
-        var agent = new ChatCompletionAgent(templateConfig, new KernelPromptTemplateFactory())
-        {
-            Kernel = kernel,
-            Arguments = new KernelArguments(promptExecutionSettings)
-        };
-
-        return new ConversationAssistant(agent, new DefaultMemoryStrategy(), publisher);
+        return new Agent(streamingAgent);
     }
 
     public async Task<ITitleAssistant> CreateTitleAssistant()

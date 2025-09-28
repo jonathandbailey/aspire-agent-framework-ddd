@@ -1,9 +1,10 @@
-﻿using Microsoft.SemanticKernel;
+﻿using Infrastructure.Interfaces;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 
 namespace Infrastructure.Agents
 {
-    public class StreamingAgent(ChatCompletionAgent chatCompletionAgent) : IStreamingAgent
+    public class BaseStreamingAgent(ChatCompletionAgent chatCompletionAgent) : IBaseStreamingAgent
     {
         public async IAsyncEnumerable<AgentResponseItem<StreamingChatMessageContent>> InvokeStreamAsync(
             ChatHistoryAgentThread thread)

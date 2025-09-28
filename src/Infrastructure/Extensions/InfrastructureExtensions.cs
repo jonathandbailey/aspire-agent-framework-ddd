@@ -1,7 +1,6 @@
 ﻿using Application.Interfaces;
 using Infrastructure.Adapters;
 using Infrastructure.Assistants;
-using Infrastructure.Interfaces;
 using Infrastructure.Queries;
 using Infrastructure.Settings;
 using Infrastructure.Storage;
@@ -28,7 +27,6 @@ public static class InfrastructureExtensions
         });
 
 
-        services.AddScoped<IAssistantMemory, DefaultMemoryStrategy>();
         services.AddScoped<IAssistantFactory, AssistantFactory>();
         services.AddScoped<IConversationQueries, ConversationQuerieses>();
 
