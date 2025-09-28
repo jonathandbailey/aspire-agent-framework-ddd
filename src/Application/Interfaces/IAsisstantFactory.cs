@@ -7,4 +7,6 @@ public interface IAssistantFactory
     Task<IConversationAssistant> CreateConversationAssistant();
 
     Task<ITitleAssistant> CreateTitleAssistant();
+
+    Task<IConversationAgent> CreateConversationAgent();
 }

@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Infrastructure.Agents;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
@@ -18,6 +19,45 @@ public class AssistantFactory(IAzureStorageRepository storageRepository, Kernel 
     /// <returns>A configured instance of <see cref="ChatCompletionAgent"/>.</returns>
     /// <exception cref="InvalidOperationException">Thrown when the downloaded agent template is empty or invalid.</exception>
     /// <exception cref="Exception">Thrown when there is an error downloading the agent template.</exception>
+
+    public async Task<IConversationAgent> CreateConversationAgent()
+    {
+        string agentTemplate;
+
+        try
+        {
+            agentTemplate = await storageRepository.DownloadTextBlobAsync(InfrastructureConstants.ChatAgentTemplateName, InfrastructureConstants.AgentTemplatesContainerName);
+
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Failed to load agent template : {ChatAgentTemplateName}", InfrastructureConstants.ChatAgentTemplateName);
+            throw;
+        }
+
+        if (string.IsNullOrWhiteSpace(agentTemplate))
+        {
+            throw new InvalidOperationException($"The downloaded agent template is empty or invalid : {InfrastructureConstants.ChatAgentTemplateName}");
+        }
+
+        var templateConfig = KernelFunctionYaml.ToPromptTemplateConfig(agentTemplate);
+
+        var promptExecutionSettings = new OpenAIPromptExecutionSettings
+        {
+            ServiceId = InfrastructureConstants.ChatAgentModeServiceId
+        };
+
+        var agent = new ChatCompletionAgent(templateConfig, new KernelPromptTemplateFactory())
+        {
+            Kernel = kernel,
+            Arguments = new KernelArguments(promptExecutionSettings)
+        };
+
+        var streamingAgent = new StreamingAgent(agent);
+
+        return new ConversationAgent(streamingAgent);
+    }
+    
     public async Task<IConversationAssistant> CreateConversationAssistant()
     {
         string agentTemplate;

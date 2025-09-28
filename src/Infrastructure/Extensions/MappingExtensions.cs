@@ -6,7 +6,7 @@ namespace Infrastructure.Extensions;
 
 public static class MappingExtensions
 {
-    private static ConversationMessageDto Map(this Message message)
+    private static ConversationMessageDto Map(this BaseMessage message)
     {
         return new ConversationMessageDto(message.Id, message.Index, message.Role, message.Content);
     }

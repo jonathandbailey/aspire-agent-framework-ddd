@@ -1,11 +1,17 @@
-﻿using Application.Interfaces;
+﻿using System.Text;
+using Application.Events.Integration;
+using Application.Interfaces;
 using Domain.Conversations;
+using Domain.Interfaces;
 using MediatR;
 
 namespace Application.Conversations.Commands;
 
 public class StartConversationExchangeCommandHandler(IConversationRepository conversationRepository,
-    IAssistantFactory assistantFactory) : IRequestHandler<StartConversationExchangeCommand>
+    IAssistantFactory assistantFactory, 
+    IConversationDomainService conversationDomainService,
+        IStreamingEventPublisher publisher
+    ) : IRequestHandler<StartConversationExchangeCommand>
 {
     public async Task Handle(StartConversationExchangeCommand request, CancellationToken cancellationToken)
     {
@@ -15,11 +21,20 @@ public class StartConversationExchangeCommandHandler(IConversationRepository con
 
         await conversationRepository.SaveAsync(conversation);
 
-        var assistant = await assistantFactory.CreateConversationAssistant();
+        var assistant = await assistantFactory.CreateConversationAgent();
 
-        var assistantResponseDto = await assistant.GenerateResponseAsync(conversation, request.ExchangeId);
+        var messages = conversationDomainService.GetMessages(conversation);
 
-        conversation.CompleteConversationExchange(ExchangeId.FromGuid(request.ExchangeId), assistantResponseDto.Content);
+        var stringBuilder = new StringBuilder();
+
+        await foreach (var response in assistant.InvokeStreamAsync(messages))
+        {
+            await publisher.Send(new StreamingApplicationEvent(conversation.UserId, request.ExchangeId, conversation.Id, response.Content));
+
+            stringBuilder.Append(response.Content);
+        }
+    
+        conversation.CompleteConversationExchange(ExchangeId.FromGuid(request.ExchangeId), stringBuilder.ToString());
 
         await conversationRepository.SaveAsync(conversation);
     }

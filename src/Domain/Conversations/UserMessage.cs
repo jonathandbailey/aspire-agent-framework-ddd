@@ -2,7 +2,7 @@
 
 namespace Domain.Conversations;
 
-public class UserMessage : Message
+public class UserMessage : BaseMessage
 {
     public UserMessage(Guid id, int index, string content) : base(id, index, content, "user")
     {

@@ -30,4 +30,23 @@ public class ConversationDomainService : IConversationDomainService
 
         return stringBuilder.ToString();
     }
+
+    public List<Message> GetMessages(Conversation conversation)
+    {
+        var messages = new List<Message>();
+
+        var index = 0;
+
+        foreach (var thread in conversation.Threads)
+        {
+            foreach (var exchange in thread.Exchanges)
+            {
+                messages.Add(new Message(exchange.UserMessage.Id, index++, exchange.UserMessage.Content, exchange.UserMessage.Role));
+                messages.Add(new Message(exchange.AssistantMessage.Id, index++, exchange.AssistantMessage.Content, exchange.AssistantMessage.Role));
+            }
+        }
+        
+        return messages;
+    }
+
 }

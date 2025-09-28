@@ -1,6 +1,6 @@
 ﻿namespace Domain.Common;
 
-public abstract class Message
+public abstract class BaseMessage
 {
     public Guid Id { get; }
 
@@ -10,7 +10,7 @@ public abstract class Message
 
     public int Index { get; private set; }
 
-    protected Message(Guid id, int index, string content, string role)
+    protected BaseMessage(Guid id, int index, string content, string role)
     {
         Verify.NotEmpty(id);
         Verify.NotNull(content);
