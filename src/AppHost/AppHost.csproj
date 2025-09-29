@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Api\Api.csproj" />
+    <ProjectReference Include="..\Hub\Hub.csproj" />
   </ItemGroup>
 
 </Project>
