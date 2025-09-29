@@ -34,6 +34,7 @@ var ui = builder.AddNpmApp(uiName, uiSourcePath, scriptName: uiScriptName)
     .PublishAsDockerFile();
 
 api.WithReference(ui);
+hub.WithReference(ui);
 
 
 var build = builder.Build();

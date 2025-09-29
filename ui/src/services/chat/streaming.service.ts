@@ -7,8 +7,9 @@ class SignalRService {
     private handlers: Record<string, CallbackFn> = {};
 
     async initialize(): Promise<void> {
+        console.log("Initializing SignalR connection..." + import.meta.env.VITE_HUB_BASE_URL);
         this.connection = new signalR.HubConnectionBuilder()
-            .withUrl(import.meta.env.VITE_API_BASE_URL + "/hub")
+            .withUrl(import.meta.env.VITE_HUB_BASE_URL + "/hub")
             .withAutomaticReconnect()
             .build();
 
