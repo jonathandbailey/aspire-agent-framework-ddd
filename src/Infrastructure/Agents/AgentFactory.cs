@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces;
-using Infrastructure.Assistants;
 using Infrastructure.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
@@ -15,7 +14,10 @@ namespace Infrastructure.Agents;
 public class AgentFactory(IAzureStorageRepository storageRepository, Kernel kernel, ILogger<AgentFactory> logger) : IAgentFactory
 {
 
-    private readonly List<AgentSettings> _agentSettings = [ new AgentSettings { Name = "Conversation", PromptTemplateName = "chat-assistant.yaml" }];
+    private readonly List<AgentSettings> _agentSettings = [ 
+        new AgentSettings { Name = "Conversation", PromptTemplateName = "chat-assistant.yaml" },
+        new AgentSettings { Name = "Title", PromptTemplateName = "title-assistant.yaml"}
+    ];
     
     
     /// <summary>
@@ -62,41 +64,5 @@ public class AgentFactory(IAzureStorageRepository storageRepository, Kernel kern
         var streamingAgent = new BaseStreamingAgent(agent);
 
         return new Agent(streamingAgent);
-    }
-
-    public async Task<ITitleAssistant> CreateTitleAssistant()
-    {
-        string agentTemplate;
-
-        try
-        {
-            agentTemplate = await storageRepository.DownloadTextBlobAsync(InfrastructureConstants.TitleAssistantName, InfrastructureConstants.AgentTemplatesContainerName);
-
-        }
-        catch (Exception exception)
-        {
-            logger.LogError(exception, "Failed to load agent template : {ChatAgentTemplateName}", InfrastructureConstants.TitleAssistantName);
-            throw;
-        }
-
-        if (string.IsNullOrWhiteSpace(agentTemplate))
-        {
-            throw new InvalidOperationException($"The downloaded agent template is empty or invalid : {InfrastructureConstants.TitleAssistantName}");
-        }
-
-        var templateConfig = KernelFunctionYaml.ToPromptTemplateConfig(agentTemplate);
-
-        var promptExecutionSettings = new OpenAIPromptExecutionSettings
-        {
-            ServiceId = InfrastructureConstants.ChatAgentModeServiceId
-        };
-
-        var agent = new ChatCompletionAgent(templateConfig, new KernelPromptTemplateFactory())
-        {
-            Kernel = kernel,
-            Arguments = new KernelArguments(promptExecutionSettings)
-        };
-
-        return new TitleAssistant(agent);
     }
 }

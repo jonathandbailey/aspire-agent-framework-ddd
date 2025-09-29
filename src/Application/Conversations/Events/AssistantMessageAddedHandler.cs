@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using System.Text;
+using Application.Interfaces;
 using Domain.Events;
 using Domain.Interfaces;
 using MediatR;
@@ -14,13 +15,18 @@ public class AssistantMessageAddedHandler(IConversationRepository conversationRe
 
         if (string.IsNullOrWhiteSpace(conversation.Name))
         {
-            var titleAssistant = await agentFactory.CreateTitleAssistant();
+            var titleAssistant = await agentFactory.CreateAgent("Title");
 
-            var threadSummary = conversationDomainService.GetConversationSummary(conversation);
-        
-            var response = await titleAssistant.InvokeAsync(threadSummary);
+            var threadSummary = conversationDomainService.GetMessages(conversation);
+
+            var stringBuilder = new StringBuilder();
+
+            await foreach (var response in titleAssistant.InvokeStreamAsync(threadSummary))
+            {
+                stringBuilder.Append(response.Content);
+            }
           
-            conversation.UpdateTitle(response.Content);
+            conversation.UpdateTitle(stringBuilder.ToString());
 
             await conversationRepository.SaveAsync(conversation);
         }
