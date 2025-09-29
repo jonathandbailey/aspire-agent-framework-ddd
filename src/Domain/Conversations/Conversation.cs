@@ -76,7 +76,7 @@ public class Conversation : Entity
     public bool IsFirstExchange(ExchangeId exchangeId, Guid threadId)
     {
         var firstThread = Threads.OrderBy(t => t.Index).First(x => x.Id == threadId);
-        if (firstThread.Index == 0)
+        if (firstThread.Index != 0)
             return false;
 
         var firstExchange = firstThread.Exchanges
