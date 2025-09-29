@@ -54,7 +54,7 @@ public class Conversation : Entity
     {
         _activeThread.CompleteConversationExchange(exchangeId, content);
 
-        AddDomainEvent(new ConversationTurnEndedEvent(UserId, Id));
+        AddDomainEvent(new ConversationExchangeCompletedEvent(UserId, Id, _activeThread.Id, exchangeId));
     }
 
     private ConversationThread CreateNewThread()
@@ -71,5 +71,18 @@ public class Conversation : Entity
         Name = title;
 
         AddDomainEvent(new ConversationTitleUpdatedEvent(UserId, Id, Name));
+    }
+
+    public bool IsFirstExchange(ExchangeId exchangeId, Guid threadId)
+    {
+        var firstThread = Threads.OrderBy(t => t.Index).First(x => x.Id == threadId);
+        if (firstThread.Index == 0)
+            return false;
+
+        var firstExchange = firstThread.Exchanges
+            .OrderBy(e => e.Index)
+            .FirstOrDefault();
+
+        return firstExchange?.Id == exchangeId.Value;
     }
 }

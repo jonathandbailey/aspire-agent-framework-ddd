@@ -3,4 +3,8 @@ using MediatR;
 
 namespace Domain.Events;
 
-public sealed record ConversationTurnEndedEvent(UserId UserId, Guid ConversationId) : INotification;
+public sealed record ConversationExchangeCompletedEvent(
+    UserId UserId,
+    Guid ConversationId,
+    Guid ThreadId,
+    ExchangeId ExchangeId) : INotification;

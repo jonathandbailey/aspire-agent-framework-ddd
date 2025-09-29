@@ -43,7 +43,7 @@ namespace Domain.Tests
             var exchange = conversation.Threads.First().Exchanges.First(x => x.ExchangeId.Equals(exchangeId));
             Assert.Equal("assistant content", exchange.AssistantMessage.Content);
 
-            Assert.Contains(conversation.DomainEvents, e => e is ConversationTurnEndedEvent);
+            Assert.Contains(conversation.DomainEvents, e => e is ConversationExchangeCompletedEvent);
         }
 
         [Fact]
