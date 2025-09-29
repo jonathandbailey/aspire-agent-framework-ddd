@@ -24,3 +24,6 @@
 /SemanticKernel.sln.DotSettings.user
 /src/Domain.Tests/bin/Debug/net9.0
 /src/Domain.Tests/obj
+/src/Hub/bin/Debug/net9.0
+/src/Hub/obj
+/src/Hub/Hub.csproj.user
