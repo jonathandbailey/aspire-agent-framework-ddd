@@ -4,13 +4,19 @@ using MediatR;
 
 namespace Application.Events.Integration;
 
-public class StreamingApplicationEventHandler(IConversationClient client, IMessageBus messageBus) : IRequestHandler<StreamingApplicationEvent>
+public class StreamingApplicationEventHandler(IMessageBus messageBus) : 
+    IRequestHandler<UserStreamingApplicationEvent>,
+    IRequestHandler<ConversationTitleUpdateApplicationEvent>
 {
-    public async Task Handle(StreamingApplicationEvent request, CancellationToken cancellationToken)
+    public async Task Handle(UserStreamingApplicationEvent request, CancellationToken cancellationToken)
     {
-        await client.ChatWithUser(request.UserId.Value, new ChatResponseDto(request.ExchangeId, request.Content, request.ConversationId));
+        await messageBus.SendAsync(new ConversationStreamingMessage(request.UserId.Value, request.Content,
+            request.ConversationId, request.ExchangeId), "UserConversationStream");
+    }
 
-        await messageBus.PublishToUser(new ConversationStreamingMessage(request.UserId.Value, request.Content,
-            request.ConversationId, request.ExchangeId));
+    public async Task Handle(ConversationTitleUpdateApplicationEvent request, CancellationToken cancellationToken)
+    {
+        await messageBus.SendAsync(new ConversationTitleUpdatedMessage(request.UserId.Value, 
+            request.ConversationId, request.Content), "ConversationTitleStream");
     }
 }

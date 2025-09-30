@@ -6,8 +6,8 @@ namespace Application.Services;
 
 public class StreamingEventPublisher(IMediator mediator) : IStreamingEventPublisher
 {
-    public async Task Send(StreamingApplicationEvent streamingApplicationEvent)
+    public async Task Send(UserStreamingApplicationEvent userStreamingApplicationEvent)
     {
-        await mediator.Send(streamingApplicationEvent);
+        await mediator.Send(userStreamingApplicationEvent);
     }
 }

@@ -29,7 +29,7 @@ public class StartConversationExchangeCommandHandler(IConversationRepository con
 
         await foreach (var response in assistant.InvokeStreamAsync(messages))
         {
-            await publisher.Send(new StreamingApplicationEvent(conversation.UserId, request.ExchangeId, conversation.Id, response.Content));
+            await publisher.Send(new UserStreamingApplicationEvent(conversation.UserId, request.ExchangeId, conversation.Id, response.Content));
 
             stringBuilder.Append(response.Content);
         }

@@ -4,5 +4,5 @@ namespace Application.Interfaces;
 
 public interface IStreamingEventPublisher
 {
-    Task Send(StreamingApplicationEvent streamingApplicationEvent);
+    Task Send(UserStreamingApplicationEvent userStreamingApplicationEvent);
 }

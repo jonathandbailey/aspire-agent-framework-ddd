@@ -1,5 +1,4 @@
-﻿using Application.Dto;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Azure.Messaging.ServiceBus;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -18,10 +17,15 @@ public class AzureMessageBus(ServiceBusClient serviceBusClient) : IMessageBus
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public async Task PublishToUser(ConversationStreamingMessage payload)
+    public async Task SendAsync<T>(T payload, string target)
     {
         var serializedConversation = JsonSerializer.Serialize(payload, SerializerOptions);
 
-        await _sender.SendMessageAsync(new ServiceBusMessage(serializedConversation));
+        var serviceBusMessage = new ServiceBusMessage(serializedConversation) { ApplicationProperties =
+        {
+            { "Target" , target}
+        }};
+
+        await _sender.SendMessageAsync(serviceBusMessage);
     }
 }

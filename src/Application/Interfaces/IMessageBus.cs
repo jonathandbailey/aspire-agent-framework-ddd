@@ -1,8 +1,6 @@
-﻿using Application.Dto;
-
-namespace Application.Interfaces;
+﻿namespace Application.Interfaces;
 
 public interface IMessageBus
 {
-    Task PublishToUser(ConversationStreamingMessage payload);
+    Task SendAsync<T>(T payload, string target);
 }
