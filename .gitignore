@@ -27,3 +27,6 @@
 /src/Hub/bin/Debug/net9.0
 /src/Hub/obj
 /src/Hub/Hub.csproj.user
+/src/Api.Hub/bin/Debug/net9.0
+/src/Api.Hub/obj
+/src/Api.Hub/Api.Hub.csproj.user
