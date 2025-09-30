@@ -1,13 +1,15 @@
-﻿using Application.Events.Integration;
-using Application.Interfaces;
+﻿using Application.Interfaces;
+using Domain.Common;
 using MediatR;
 
 namespace Application.Services;
 
 public class StreamingEventPublisher(IMediator mediator) : IStreamingEventPublisher
 {
-    public async Task Send(UserStreamingApplicationEvent userStreamingApplicationEvent)
+    public async Task Send<T>(T applicationEvent)
     {
-        await mediator.Send(userStreamingApplicationEvent);
+        Verify.NotNull(applicationEvent);
+        
+        await mediator.Send(applicationEvent);
     }
 }

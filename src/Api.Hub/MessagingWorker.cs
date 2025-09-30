@@ -38,7 +38,40 @@ public class MessagingWorker : BackgroundService
 
     private async Task OnMessageAsync(ProcessMessageEventArgs args)
     {
-        var conversation = JsonSerializer.Deserialize<ConversationStreamingMessage>(args.Message.Body, SerializerOptions);
+        if (args.Message.ApplicationProperties["Target"].ToString() == "UserConversationStream")
+        {
+           await HandleUserStreamMessage(args.Message);
+        }
+
+        if (args.Message.ApplicationProperties["Target"].ToString() == "ConversationTitleStream")
+        {
+            await HandleTitleUpdateStreamMessage(args.Message);
+        }
+ 
+        await args.CompleteMessageAsync(args.Message);
+    }
+
+    private async Task HandleTitleUpdateStreamMessage(ServiceBusReceivedMessage message)
+    {
+        var titleUpdatedMessage = JsonSerializer.Deserialize<ConversationTitleUpdatedMessage>(message.Body, SerializerOptions);
+
+        if (titleUpdatedMessage == null)
+        {
+            throw new Exception("Failed to deserialize message");
+        }
+
+        var connectionIds = _userConnectionManager.GetConnections(titleUpdatedMessage.UserId);
+
+        foreach (var connectionId in connectionIds)
+        {
+            await _hub.Clients.Client(connectionId).SendAsync("command", new ClientCommandUpdateConversationTitle(titleUpdatedMessage.ConversationId, titleUpdatedMessage.Content));
+        }
+
+    }
+
+    private async Task HandleUserStreamMessage(ServiceBusReceivedMessage message)
+    {
+        var conversation = JsonSerializer.Deserialize<ConversationStreamingMessage>(message.Body, SerializerOptions);
 
         if (conversation == null)
         {
@@ -52,7 +85,6 @@ public class MessagingWorker : BackgroundService
             await _hub.Clients.Client(connectionId).SendAsync("chat", new ChatResponseDto(conversation.ExchangeId, conversation.Message, conversation.ConversationId));
         }
 
-        await args.CompleteMessageAsync(args.Message);
     }
 
     private Task ErrorHandler(ProcessErrorEventArgs args)
