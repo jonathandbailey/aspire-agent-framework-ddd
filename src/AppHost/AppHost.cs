@@ -1,6 +1,4 @@
 
-using Aspire.Hosting.Azure;
-
 var builder = DistributedApplication.CreateBuilder(args);
 
 const string apiName = "api";
@@ -22,7 +20,7 @@ var storage = builder.AddAzureStorage(storageName)
 var serviceBus = builder.AddAzureServiceBus("messaging").RunAsEmulator();
 var topic = serviceBus.AddServiceBusTopic("topic");
 
-topic.AddServiceBusSubscription("sub1")
+topic.AddServiceBusSubscription("subscription")
     .WithProperties(subscription =>
     {
         subscription.MaxDeliveryCount = 10;
@@ -30,7 +28,8 @@ topic.AddServiceBusSubscription("sub1")
 
 var blobs = storage.AddBlobs(blobStorageConnectionName);
 
-var api = builder.AddProject<Projects.Api>(apiName).WithReference(blobs).WaitFor(storage);
+var api = builder.AddProject<Projects.Api>(apiName).WithReference(blobs).WaitFor(storage)
+    .WithReference(serviceBus).WaitFor(topic);
 
 var hub = builder.AddProject<Projects.Hub>("hub");
 

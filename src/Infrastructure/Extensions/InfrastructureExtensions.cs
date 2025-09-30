@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Infrastructure.Adapters;
 using Infrastructure.Agents;
+using Infrastructure.Messaging;
 using Infrastructure.Queries;
 using Infrastructure.Settings;
 using Infrastructure.Storage;
@@ -8,6 +9,7 @@ using MediatR;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using IMessageBus = Application.Interfaces.IMessageBus;
 
 namespace Infrastructure.Extensions;
 
@@ -33,7 +35,10 @@ public static class InfrastructureExtensions
         services.AddAzureClients(azure =>
         {
             azure.AddBlobServiceClient(configuration.GetConnectionString(InfrastructureConstants.BlobStorageConnectionName));
+            azure.AddServiceBusClient( configuration.GetConnectionString("messaging"));
         });
+
+        services.AddScoped<IMessageBus, AzureMessageBus>();
 
         services.Configure<AzureStorageSettings>((options)=> configuration.GetSection("AzureStorageSettings").Bind(options));
 

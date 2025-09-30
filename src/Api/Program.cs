@@ -20,6 +20,9 @@ builder.AddCorsPolicyFromServiceDiscovery();
 
 builder.Services.AddApiServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
+
+builder.AddAzureServiceBusClient(connectionName: "messaging");
+
 builder.Services.AddApplicationServices();
 
 builder.Services.AddTransient<GlobalExceptionHandler>();
