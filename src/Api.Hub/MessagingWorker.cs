@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using Api.Hub.Dto;
 using Api.Hub.Interfaces;
 using Azure.Messaging.ServiceBus;
-using Hub;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Api.Hub;
@@ -38,16 +37,23 @@ public class MessagingWorker : BackgroundService
 
     private async Task OnMessageAsync(ProcessMessageEventArgs args)
     {
-        if (args.Message.ApplicationProperties["Target"].ToString() == "UserConversationStream")
+        var target = args.Message.ApplicationProperties["Target"].ToString();
+
+        if (string.IsNullOrWhiteSpace(target))
+            throw new InvalidOperationException("Message missing or empty 'Target' application property.");
+
+        switch (target)
         {
-           await HandleUserStreamMessage(args.Message);
+            case "UserConversationStream":
+                await HandleUserStreamMessage(args.Message);
+                break;
+            case "ConversationTitleStream":
+                await HandleTitleUpdateStreamMessage(args.Message);
+                break;
+            default:
+                throw new InvalidOperationException($"Unknown message target: {target}");
         }
 
-        if (args.Message.ApplicationProperties["Target"].ToString() == "ConversationTitleStream")
-        {
-            await HandleTitleUpdateStreamMessage(args.Message);
-        }
- 
         await args.CompleteMessageAsync(args.Message);
     }
 
@@ -66,7 +72,6 @@ public class MessagingWorker : BackgroundService
         {
             await _hub.Clients.Client(connectionId).SendAsync("command", new ClientCommandUpdateConversationTitle(titleUpdatedMessage.ConversationId, titleUpdatedMessage.Content));
         }
-
     }
 
     private async Task HandleUserStreamMessage(ServiceBusReceivedMessage message)
