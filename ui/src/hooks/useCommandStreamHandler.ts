@@ -11,7 +11,7 @@ export const useCommandStreamHandler = () => {
         const handleCommand = ({ conversationId, title }: { conversationId: string; title: string }) => {
             queryClient.setQueryData(CONVERSATIONS_QUERY_KEY, (oldConversations: Conversation[] = []) =>
                 oldConversations.map(convo =>
-                    convo.id === conversationId ? { ...convo, name: title } : convo
+                    convo.id === conversationId ? { ...convo, name: `${convo.name}${title}`.trim() } : convo
                 )
             );
             queryClient.invalidateQueries({ queryKey: CONVERSATIONS_QUERY_KEY });
@@ -24,3 +24,4 @@ export const useCommandStreamHandler = () => {
         };
     }, [queryClient]);
 };
+

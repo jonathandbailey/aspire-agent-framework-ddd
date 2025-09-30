@@ -1,14 +1,15 @@
-﻿using System.Text;
+﻿using Application.Events.Integration;
 using Application.Interfaces;
 using Domain.Conversations;
 using Domain.Events;
 using Domain.Interfaces;
 using MediatR;
+using System.Text;
 
 namespace Application.Conversations.Events;
 
 public class ConversationExchangeCompletedHandler(IConversationRepository conversationRepository, IConversationDomainService conversationDomainService,
-    IAgentFactory agentFactory) : INotificationHandler<ConversationExchangeCompletedEvent>
+    IAgentFactory agentFactory, IStreamingEventPublisher publisher) : INotificationHandler<ConversationExchangeCompletedEvent>
 {
     public async Task Handle(ConversationExchangeCompletedEvent request, CancellationToken cancellationToken)
     {
@@ -35,6 +36,8 @@ public class ConversationExchangeCompletedHandler(IConversationRepository conver
 
         await foreach (var response in agent.InvokeStreamAsync(messages))
         {
+            await publisher.Send(new ConversationTitleUpdateApplicationEvent(conversation.UserId, conversation.Id, response.Content));
+
             stringBuilder.Append(response.Content);
         }
 
