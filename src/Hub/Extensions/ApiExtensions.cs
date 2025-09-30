@@ -6,7 +6,7 @@ public static  class ApiExtensions
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services)
     {
-        services.AddScoped<IUserConnectionManager, UserConnectionManager>();
+        services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
  
         return services;
     }

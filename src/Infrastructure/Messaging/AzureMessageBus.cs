@@ -8,6 +8,8 @@ namespace Infrastructure.Messaging;
 
 public class AzureMessageBus(ServiceBusClient serviceBusClient) : IMessageBus
 {
+    private readonly ServiceBusSender _sender = serviceBusClient.CreateSender("topic");
+
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,
@@ -18,19 +20,8 @@ public class AzureMessageBus(ServiceBusClient serviceBusClient) : IMessageBus
 
     public async Task PublishToUser(ConversationStreamingMessage payload)
     {
-        var sender = serviceBusClient.CreateSender("topic");
-
         var serializedConversation = JsonSerializer.Serialize(payload, SerializerOptions);
 
-        using var messageBatch =
-            await sender.CreateMessageBatchAsync();
-
-        if (!messageBatch.TryAddMessage(
-                new ServiceBusMessage(serializedConversation)))
-        {
-            throw new Exception($"The payload is too large to fit the batch.");
-        }
-
-        await sender.SendMessagesAsync(messageBatch);
+        await _sender.SendMessageAsync(new ServiceBusMessage(serializedConversation));
     }
 }

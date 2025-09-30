@@ -31,7 +31,7 @@ var blobs = storage.AddBlobs(blobStorageConnectionName);
 var api = builder.AddProject<Projects.Api>(apiName).WithReference(blobs).WaitFor(storage)
     .WithReference(serviceBus).WaitFor(topic);
 
-var hub = builder.AddProject<Projects.Hub>("hub");
+var hub = builder.AddProject<Projects.Hub>("hub").WithReference(serviceBus).WaitFor(topic);
 
 var ui = builder.AddNpmApp(uiName, uiSourcePath, scriptName: uiScriptName)
     .WithReference(api)

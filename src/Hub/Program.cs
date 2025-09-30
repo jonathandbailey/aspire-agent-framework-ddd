@@ -1,5 +1,6 @@
 using Hub;
 using Hub.Extensions;
+using Microsoft.Extensions.Azure;
 using ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,9 +11,16 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddApiServices();
 
+builder.Services.AddAzureClients(azure =>
+{
+    azure.AddServiceBusClient(builder.Configuration.GetConnectionString("messaging"));
+});
+
 builder.Services.AddSignalR();
 
 builder.AddCorsPolicyFromServiceDiscovery();
+
+builder.Services.AddHostedService<MessagingWorker>();
 
 var app = builder.Build();
 
@@ -30,6 +38,5 @@ else
 app.MapHub<ChatHub>("hub");
 
 app.UseCorsPolicyServiceDiscovery();
-
 
 app.Run();
