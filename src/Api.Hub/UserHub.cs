@@ -1,9 +1,9 @@
 ﻿using Api.Extensions;
-using Application.Interfaces;
+using Api.Hub.Interfaces;
 
-namespace Hub;
+namespace Api.Hub;
 
-public class ChatHub(IUserConnectionManager userConnectionManager, ILogger<ChatHub> logger) : Microsoft.AspNetCore.SignalR.Hub
+public class UserHub(IUserConnectionManager userConnectionManager, ILogger<UserHub> logger) : Microsoft.AspNetCore.SignalR.Hub
 {
     public override async Task OnConnectedAsync()
     {

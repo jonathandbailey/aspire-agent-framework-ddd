@@ -1,6 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Api.Hub.Interfaces;
 
-namespace Hub.Extensions;
+namespace Api.Hub.Extensions;
 
 public static  class ApiExtensions
 {

@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Api.Hub\Api.Hub.csproj" />
     <ProjectReference Include="..\Api\Api.csproj" />
-    <ProjectReference Include="..\Hub\Hub.csproj" />
   </ItemGroup>
 
 </Project>

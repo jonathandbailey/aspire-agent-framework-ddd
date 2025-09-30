@@ -1,4 +1,4 @@
-﻿namespace Application.Interfaces;
+﻿namespace Api.Hub.Interfaces;
 
 public interface IUserConnectionManager
 {

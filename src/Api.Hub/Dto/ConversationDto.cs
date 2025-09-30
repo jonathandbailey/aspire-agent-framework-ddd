@@ -1,4 +1,4 @@
-﻿namespace Hub.Dto;
+﻿namespace Api.Hub.Dto;
 
 public record ConversationStreamingMessage(Guid UserId, string Message, Guid ConversationId, Guid ExchangeId);
 

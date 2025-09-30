@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
-using Api;
-using Application.Interfaces;
+using Api.Hub.Interfaces;
 
-namespace Hub;
+
+namespace Api.Hub;
 
 public class UserConnectionManager : IUserConnectionManager
 {

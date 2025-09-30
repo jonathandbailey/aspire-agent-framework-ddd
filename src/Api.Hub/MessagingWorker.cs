@@ -1,15 +1,16 @@
-﻿using Application.Interfaces;
-using Azure.Messaging.ServiceBus;
-using Microsoft.AspNetCore.SignalR;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using Hub.Dto;
+using Api.Hub.Dto;
+using Api.Hub.Interfaces;
+using Azure.Messaging.ServiceBus;
+using Hub;
+using Microsoft.AspNetCore.SignalR;
 
-namespace Hub;
+namespace Api.Hub;
 
 public class MessagingWorker : BackgroundService
 {
-    private readonly IHubContext<ChatHub> _hub;
+    private readonly IHubContext<UserHub> _hub;
     private readonly IUserConnectionManager _userConnectionManager;
     private readonly ServiceBusProcessor _processor;
 
@@ -21,7 +22,7 @@ public class MessagingWorker : BackgroundService
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public MessagingWorker(ServiceBusClient serviceBusClient, IHubContext<ChatHub> hub, IUserConnectionManager userConnectionManager)
+    public MessagingWorker(ServiceBusClient serviceBusClient, IHubContext<UserHub> hub, IUserConnectionManager userConnectionManager)
     {
         _hub = hub;
         _userConnectionManager = userConnectionManager;

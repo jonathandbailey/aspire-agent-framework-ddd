@@ -1,3 +1,5 @@
+using Api.Hub;
+using Api.Hub.Extensions;
 using Hub;
 using Hub.Extensions;
 using Microsoft.Extensions.Azure;
@@ -35,7 +37,7 @@ else
     app.UseHttpsRedirection();
 }
 
-app.MapHub<ChatHub>("hub");
+app.MapHub<UserHub>("hub");
 
 app.UseCorsPolicyServiceDiscovery();
 
