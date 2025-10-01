@@ -1,6 +1,5 @@
 using Api;
 using Api.Extensions;
-using Api.Hubs;
 using Api.Middleware;
 using Application.Extensions;
 using Infrastructure.Extensions;
@@ -9,8 +8,6 @@ using ServiceDefaults;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-
-builder.Services.AddSignalR();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -42,8 +39,6 @@ else
 }
 
 app.UseExceptionHandler(options => { });
-
-app.MapHub<ChatHub>("hub");
 
 app.UseCorsPolicyServiceDiscovery();
 
