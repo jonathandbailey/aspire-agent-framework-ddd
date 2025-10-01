@@ -32,3 +32,6 @@
 /src/Api.Hub/Api.Hub.csproj.user
 /src/Infrastructure.Agents/bin/Debug/net9.0
 /src/Infrastructure.Agents/obj
+/src/Agents.Conversation/bin/Debug/net9.0
+/src/Agents.Conversation/obj
+/src/Agents.Conversation/Agents.Conversation.csproj.user
