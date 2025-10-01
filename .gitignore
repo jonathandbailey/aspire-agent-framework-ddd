@@ -30,3 +30,5 @@
 /src/Api.Hub/bin/Debug/net9.0
 /src/Api.Hub/obj
 /src/Api.Hub/Api.Hub.csproj.user
+/src/Infrastructure.Agents/bin/Debug/net9.0
+/src/Infrastructure.Agents/obj
