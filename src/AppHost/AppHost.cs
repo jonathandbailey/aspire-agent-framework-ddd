@@ -17,7 +17,7 @@ var storage = builder.AddAzureStorage(storageName)
     .RunAsEmulator(resourceBuilder =>
         { resourceBuilder.WithDataBindMount(storageData); });
 
-var serviceBus = builder.AddAzureServiceBus("messaging").RunAsEmulator();
+var serviceBus = builder.AddAzureServiceBus("messaging").RunAsEmulator(emu => emu.WithLifetime(ContainerLifetime.Persistent));
 var topic = serviceBus.AddServiceBusTopic("topic");
 
 topic.AddServiceBusSubscription("subscription")

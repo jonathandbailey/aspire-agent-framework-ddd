@@ -2,7 +2,7 @@
 using Api.Hub.Interfaces;
 
 
-namespace Api.Hub;
+namespace Api.Hub.User;
 
 public class UserConnectionManager : IUserConnectionManager
 {

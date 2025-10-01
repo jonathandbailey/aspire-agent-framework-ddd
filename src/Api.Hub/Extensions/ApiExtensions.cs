@@ -1,4 +1,5 @@
 ﻿using Api.Hub.Interfaces;
+using Api.Hub.User;
 
 namespace Api.Hub.Extensions;
 

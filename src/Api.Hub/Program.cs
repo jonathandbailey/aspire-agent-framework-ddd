@@ -1,5 +1,6 @@
 using Api.Hub;
 using Api.Hub.Extensions;
+using Api.Hub.User;
 using Hub;
 using Hub.Extensions;
 using Microsoft.Extensions.Azure;

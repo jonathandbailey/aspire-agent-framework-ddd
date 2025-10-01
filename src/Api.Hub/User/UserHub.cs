@@ -1,7 +1,7 @@
 ﻿using Api.Extensions;
 using Api.Hub.Interfaces;
 
-namespace Api.Hub;
+namespace Api.Hub.User;
 
 public class UserHub(IUserConnectionManager userConnectionManager, ILogger<UserHub> logger) : Microsoft.AspNetCore.SignalR.Hub
 {

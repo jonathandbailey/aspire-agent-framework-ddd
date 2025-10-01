@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using Api.Hub.Dto;
 using Api.Hub.Interfaces;
+using Api.Hub.User;
 using Azure.Messaging.ServiceBus;
 using Microsoft.AspNetCore.SignalR;
 
