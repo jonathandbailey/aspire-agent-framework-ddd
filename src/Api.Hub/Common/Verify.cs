@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace Api;
+namespace Api.Hub.Common;
 
 public static class Verify
 {

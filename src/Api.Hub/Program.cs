@@ -1,7 +1,5 @@
-using Api.Hub;
 using Api.Hub.Extensions;
 using Api.Hub.User;
-using Hub;
 using Hub.Extensions;
 using Microsoft.Extensions.Azure;
 using ServiceDefaults;
@@ -22,8 +20,6 @@ builder.Services.AddAzureClients(azure =>
 builder.Services.AddSignalR();
 
 builder.AddCorsPolicyFromServiceDiscovery();
-
-builder.Services.AddHostedService<MessagingWorker>();
 
 var app = builder.Build();
 
