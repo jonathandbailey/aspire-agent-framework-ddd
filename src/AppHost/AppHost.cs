@@ -48,5 +48,8 @@ api.WithReference(ui);
 hub.WithReference(ui);
 
 
+builder.AddProject<Projects.Agents_Conversation>("agents-conversation");
+
+
 var build = builder.Build();
 build.Run();
