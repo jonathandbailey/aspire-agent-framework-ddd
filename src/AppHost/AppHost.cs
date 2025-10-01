@@ -19,6 +19,7 @@ var storage = builder.AddAzureStorage(storageName)
 
 var serviceBus = builder.AddAzureServiceBus("messaging").RunAsEmulator(emu => emu.WithLifetime(ContainerLifetime.Persistent));
 var topic = serviceBus.AddServiceBusTopic("topic");
+var queue = serviceBus.AddServiceBusQueue("queue");
 
 topic.AddServiceBusSubscription("subscription")
     .WithProperties(subscription =>
@@ -48,7 +49,9 @@ api.WithReference(ui);
 hub.WithReference(ui);
 
 
-builder.AddProject<Projects.Agents_Conversation>("agents-conversation");
+builder.AddProject<Projects.Agents_Conversation>("agents-conversation").
+WithReference(blobs).WaitFor(storage)
+    .WithReference(serviceBus).WaitFor(queue);
 
 
 var build = builder.Build();

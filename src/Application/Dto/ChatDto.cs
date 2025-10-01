@@ -1,4 +1,6 @@
-﻿namespace Application.Dto;
+﻿using Domain.Conversations;
+
+namespace Application.Dto;
 
 public record ChatRequestDto (Guid Id,string Message, Guid ConversationId, Guid ExchangeId);
 
@@ -7,3 +9,5 @@ public record ChatResponseDto(Guid Id, string Message, Guid ConversationId);
 public record ConversationStreamingMessage(Guid UserId, string Message, Guid ConversationId, Guid ExchangeId);
 
 public record ConversationTitleUpdatedMessage(Guid UserId, Guid ConversationId, string Content);
+
+public record ConversationAgentMessage(Guid UserId, Guid ExchangeId, Guid ConversationId, List<Message> Messages);

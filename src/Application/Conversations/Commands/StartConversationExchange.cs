@@ -9,6 +9,7 @@ namespace Application.Conversations.Commands;
 
 public class StartConversationExchangeCommandHandler(IConversationRepository conversationRepository,
     IAgentFactory agentFactory, 
+    IMediator mediator,
     IConversationDomainService conversationDomainService,
         IStreamingEventPublisher publisher
     ) : IRequestHandler<StartConversationExchangeCommand>
@@ -27,9 +28,12 @@ public class StartConversationExchangeCommandHandler(IConversationRepository con
 
         var stringBuilder = new StringBuilder();
 
+        await mediator.Send(new ConversationAgentEvent(conversation.UserId, request.ExchangeId, conversation.Id,
+            messages), cancellationToken);
+
         await foreach (var response in assistant.InvokeStreamAsync(messages))
         {
-            await publisher.Send(new UserStreamingApplicationEvent(conversation.UserId, request.ExchangeId, conversation.Id, response.Content));
+            //await publisher.Send(new UserStreamingApplicationEvent(conversation.UserId, request.ExchangeId, conversation.Id, response.Content));
 
             stringBuilder.Append(response.Content);
         }

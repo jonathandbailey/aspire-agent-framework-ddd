@@ -8,6 +8,7 @@ namespace Infrastructure.Messaging;
 public class AzureMessageBus(ServiceBusClient serviceBusClient) : IMessageBus
 {
     private readonly ServiceBusSender _sender = serviceBusClient.CreateSender("topic");
+    private readonly ServiceBusSender _senderQueue = serviceBusClient.CreateSender("queue");
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -27,5 +28,14 @@ public class AzureMessageBus(ServiceBusClient serviceBusClient) : IMessageBus
         }};
 
         await _sender.SendMessageAsync(serviceBusMessage);
+    }
+
+    public async Task SendAsync<T>(T payload)
+    {
+        var serializedConversation = JsonSerializer.Serialize(payload, SerializerOptions);
+
+        var serviceBusMessage = new ServiceBusMessage(serializedConversation);
+   
+        await _senderQueue.SendMessageAsync(serviceBusMessage);
     }
 }
