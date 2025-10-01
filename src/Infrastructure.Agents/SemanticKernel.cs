@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 
-namespace Infrastructure.Extensions;
+namespace Infrastructure.Agents;
 
 public static class SemanticKernel
 {

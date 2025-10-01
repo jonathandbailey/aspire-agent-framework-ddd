@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Tests", "src\Domain.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.Hub", "src\Api.Hub\Api.Hub.csproj", "{710FC96B-907E-1355-D8E3-F7DA9F91C1CB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Agents", "src\Infrastructure.Agents\Infrastructure.Agents.csproj", "{49C6F534-3F91-4489-944D-4F66B20B7F0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{710FC96B-907E-1355-D8E3-F7DA9F91C1CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{710FC96B-907E-1355-D8E3-F7DA9F91C1CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{710FC96B-907E-1355-D8E3-F7DA9F91C1CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49C6F534-3F91-4489-944D-4F66B20B7F0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49C6F534-3F91-4489-944D-4F66B20B7F0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49C6F534-3F91-4489-944D-4F66B20B7F0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49C6F534-3F91-4489-944D-4F66B20B7F0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

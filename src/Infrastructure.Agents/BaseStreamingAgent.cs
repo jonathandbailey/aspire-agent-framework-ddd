@@ -1,4 +1,4 @@
-﻿using Infrastructure.Interfaces;
+﻿using Infrastructure.Agents.Interfaces;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 

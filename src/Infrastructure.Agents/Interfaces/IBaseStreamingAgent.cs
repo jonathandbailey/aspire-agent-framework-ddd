@@ -1,7 +1,7 @@
 ﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 
-namespace Infrastructure.Interfaces;
+namespace Infrastructure.Agents.Interfaces;
 
 public interface IBaseStreamingAgent
 {

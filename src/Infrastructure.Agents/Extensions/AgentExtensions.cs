@@ -3,7 +3,7 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
 
-namespace Infrastructure.Extensions;
+namespace Infrastructure.Agents.Extensions;
 
 public static class AgentExtensions
 {

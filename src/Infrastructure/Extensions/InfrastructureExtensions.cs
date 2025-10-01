@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces;
 using Infrastructure.Adapters;
-using Infrastructure.Agents;
 using Infrastructure.Messaging;
 using Infrastructure.Queries;
 using Infrastructure.Settings;
@@ -29,7 +28,7 @@ public static class InfrastructureExtensions
         });
 
 
-        services.AddScoped<IAgentFactory, AgentFactory>();
+ 
         services.AddScoped<IConversationQueries, ConversationQuerieses>();
 
         services.AddAzureClients(azure =>
@@ -41,11 +40,7 @@ public static class InfrastructureExtensions
         services.AddScoped<IMessageBus, AzureMessageBus>();
 
         services.Configure<AzureStorageSettings>((options)=> configuration.GetSection("AzureStorageSettings").Bind(options));
-
-        var modelSettings = configuration.GetRequiredSetting<LanguageModelSettings>(InfrastructureConstants.LanguageModelSettingsKey);
-
-        services.AddSemanticKernel(modelSettings);
-
+      
         return services;
     }
 }
