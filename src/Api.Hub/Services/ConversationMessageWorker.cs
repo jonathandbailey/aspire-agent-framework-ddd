@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using Api.Hub.Interfaces;
+﻿using Api.Hub.Interfaces;
 using Azure.Messaging.ServiceBus;
 
 namespace Api.Hub.Services;

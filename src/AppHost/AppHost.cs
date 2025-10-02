@@ -11,6 +11,8 @@ var serviceBus = builder.AddServiceBusServices();
 var topic = serviceBus.AddServiceBusTopic("topic");
 var queue = serviceBus.AddServiceBusQueue("queue");
 
+var conversationDomainQueue = serviceBus.AddServiceBusQueue("conversation-domain-queue");
+
 topic.AddServiceBusSubscription("subscription")
     .WithProperties(subscription =>
     {
@@ -20,7 +22,7 @@ topic.AddServiceBusSubscription("subscription")
 var blobs = builder.AddAzureBlobsServices(storage);
 
 var api = builder.AddProject<Projects.Api>(apiName).WithReference(blobs).WaitFor(storage)
-    .WithReference(serviceBus).WaitFor(topic);
+    .WithReference(serviceBus).WaitFor(topic).WaitFor(conversationDomainQueue);
 
 var hub = builder.AddProject<Projects.Api_Hub>("api-hub").WithReference(serviceBus).WaitFor(topic);
 

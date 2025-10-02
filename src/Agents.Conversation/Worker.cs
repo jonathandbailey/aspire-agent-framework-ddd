@@ -1,3 +1,4 @@
+using System.Text;
 using Agents.Conversation.Dto;
 using Application.Interfaces;
 using Azure.Messaging.ServiceBus;
@@ -12,6 +13,7 @@ public class Worker : BackgroundService
     private readonly IAgentFactory _agentFactory;
     private readonly ServiceBusProcessor _processor;
     private readonly ServiceBusSender _sender;
+    private readonly ServiceBusSender _conversationDomainSender;
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -30,6 +32,8 @@ public class Worker : BackgroundService
         _processor.ProcessErrorAsync += ErrorHandler;
 
         _sender = serviceBusClient.CreateSender("topic");
+
+        _conversationDomainSender = serviceBusClient.CreateSender("conversation-domain-queue");
     }
 
     private async Task OnMessageAsync(ProcessMessageEventArgs args)
@@ -43,8 +47,12 @@ public class Worker : BackgroundService
 
         var agent = await _agentFactory.CreateAgent("Conversation");
 
+        var stringBuilder = new StringBuilder();
+
         await foreach (var response in agent.InvokeStreamAsync(conversation.Messages))
         {
+            stringBuilder.Append(response.Content);
+            
             var payload = new ConversationStreamingMessage(conversation.UserId, response.Content,
                 conversation.ConversationId, conversation.ExchangeId);
             
@@ -60,6 +68,14 @@ public class Worker : BackgroundService
 
             await _sender.SendMessageAsync(serviceBusMessage);
         }
+
+        var message = new ConversationDomainMessage(conversation.UserId, stringBuilder.ToString(),
+            conversation.ConversationId, conversation.ExchangeId);
+
+        var serializedDomainMessage = JsonSerializer.Serialize(message, SerializerOptions);
+
+
+        await _conversationDomainSender.SendMessageAsync(new ServiceBusMessage(serializedDomainMessage));
 
         await args.CompleteMessageAsync(args.Message);
     }
