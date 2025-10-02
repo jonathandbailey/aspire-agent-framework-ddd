@@ -1,6 +1,5 @@
 using Agents.Conversation.Dto;
 using Application.Interfaces;
-using Azure.Core;
 using Azure.Messaging.ServiceBus;
 using System.Text.Json;
 using System.Text.Json.Serialization;
