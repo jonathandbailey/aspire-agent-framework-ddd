@@ -1,7 +1,9 @@
 ﻿
-namespace Application.Interfaces;
+using Application.Interfaces;
+
+namespace Agents.Conversation.Interfaces;
 
 public interface IAgentFactory
 {
-    Task<IAgent> CreateAgent(string name);
+    Task<IAgent> CreateAgent();
 }

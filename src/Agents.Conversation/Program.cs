@@ -1,5 +1,8 @@
 using Agents.Conversation;
+using Agents.Conversation.Common;
 using Agents.Conversation.Extensions;
+using Agents.Conversation.Interfaces;
+using Agents.Conversation.Services;
 using Agents.Conversation.Settings;
 using Agents.Conversation.Storage;
 using Application.Interfaces;
@@ -17,6 +20,12 @@ builder.Services.AddAzureClients(azure =>
 builder.AddServiceDefaults();
 builder.Services.AddSingleton<IAgentFactory, AgentFactory>();
 builder.Services.AddSingleton<IAzureStorageRepository, AzureStorageRepository>();
+builder.Services.AddSingleton<IAgentService, AgentService>();
+builder.Services.AddSingleton<IConversationService, ConversationService>();
+
+builder.Services.Configure<LanguageModelSettings>((options) => 
+    builder.Configuration.GetSection(InfrastructureConstants.LanguageModelSettingsKey).Bind(options));
+
 
 var modelSettings = builder.Configuration.GetRequiredSetting<LanguageModelSettings>(InfrastructureConstants.LanguageModelSettingsKey);
 

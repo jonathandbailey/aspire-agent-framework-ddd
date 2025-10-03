@@ -1,20 +1,21 @@
 ﻿using Agents.Conversation.Dto;
 using Agents.Conversation.Extensions;
 using Application.Interfaces;
-using Infrastructure.Agents.Interfaces;
+using Microsoft.Agents.AI;
 
 namespace Agents.Conversation;
 
-public class Agent(IBaseStreamingAgent agent) : IAgent
+public class Agent(AIAgent agent) : IAgent
 {
-    public async IAsyncEnumerable<AssistantResponseDto> InvokeStreamAsync(
-        List<Message> messages)
+    public async IAsyncEnumerable<AssistantResponseDto> InvokeStreamAsync(List<Message> messages)
     {
-        var thread = messages.ToChatHistoryThread();
-        
-        await foreach (var response in agent.InvokeStreamAsync(thread))
+        var thread = agent.GetNewThread();
+
+        thread = thread.ToAgentThread(messages);
+   
+        await foreach (var response in agent.RunStreamingAsync(thread))
         {
-            yield return new AssistantResponseDto { Content = response.Message.Content!};
+            yield return new AssistantResponseDto { Content = response.Text };
         }
     }
 }

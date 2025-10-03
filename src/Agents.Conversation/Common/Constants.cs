@@ -1,4 +1,4 @@
-﻿namespace Agents.Conversation;
+﻿namespace Agents.Conversation.Common;
 
 public static class InfrastructureConstants
 {

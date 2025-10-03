@@ -1,4 +1,5 @@
-﻿using Agents.Conversation.Settings;
+﻿using Agents.Conversation.Common;
+using Agents.Conversation.Settings;
 using Microsoft.SemanticKernel;
 
 namespace Agents.Conversation.Extensions;

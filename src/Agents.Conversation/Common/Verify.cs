@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace Agents.Conversation;
+namespace Agents.Conversation.Common;
 
 public static class Verify
 {

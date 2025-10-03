@@ -1,26 +1,33 @@
 ﻿using Agents.Conversation.Dto;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Agents;
-using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.Agents.AI;
+using Microsoft.Extensions.AI;
+using AgentThread = Microsoft.Agents.AI.AgentThread;
 
 namespace Agents.Conversation.Extensions;
 
 public static class AgentExtensions
 {
-    public static ChatHistoryAgentThread ToChatHistoryThread(this List<Message> messages)
+    public static AgentThread ToAgentThread(this AgentThread thread, List<Message> messages)
     {
-        var thread = new ChatHistoryAgentThread();
+        var store = thread.GetService<ChatMessageStore>();
+
+        if (store == null)
+            throw new Exception("The current agent thread does not have a Chat Message Store registered as a service.");
 
         foreach (var message in messages)
         {
             if (message.Role == "user")
             {
-                thread.ChatHistory.Add(new ChatMessageContent(AuthorRole.User, message.Content));
+                var userChatMessage = new ChatMessage(ChatRole.User, message.Content);
+
+                store.AddMessagesAsync([userChatMessage]);
             }
 
             if (message.Role == "assistant")
             {
-                thread.ChatHistory.Add(new ChatMessageContent(AuthorRole.Assistant, message.Content));
+                var userChatMessage = new ChatMessage(ChatRole.Assistant, message.Content);
+
+                store.AddMessagesAsync([userChatMessage]);
             }
         }
 

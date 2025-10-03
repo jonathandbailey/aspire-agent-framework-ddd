@@ -1,38 +1,27 @@
 ﻿using Agents.Conversation.Settings;
 using Application.Interfaces;
+using Azure.AI.OpenAI;
+using Microsoft.Agents.AI;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Agents;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
+using OpenAI;
+using System.ClientModel;
+using Agents.Conversation.Interfaces;
+using Microsoft.Extensions.Options;
+using Agents.Conversation.Common;
 
 namespace Agents.Conversation;
 
-/// <summary>
-/// Factory class responsible for creating instances of <see cref="ChatCompletionAgent"/>.
-/// </summary>
-public class AgentFactory(IAzureStorageRepository storageRepository, Kernel kernel, ILogger<AgentFactory> logger) : IAgentFactory
+public class AgentFactory(IAzureStorageRepository storageRepository, Kernel kernel, ILogger<AgentFactory> logger, IOptions<LanguageModelSettings> settings) : IAgentFactory
 {
+    private readonly LanguageModelSettings _settings = settings.Value;
 
-    private readonly List<AgentSettings> _agentSettings = [ 
-        new AgentSettings { Name = "Conversation", PromptTemplateName = "chat-assistant.yaml" },
-        new AgentSettings { Name = "Title", PromptTemplateName = "title-assistant.yaml"}
-    ];
-    
-    
-    /// <summary>
-    /// Creates an instance of <see cref="ChatCompletionAgent"/> using the agent template fetched from Azure Storage.
-    /// </summary>
-    /// <returns>A configured instance of <see cref="ChatCompletionAgent"/>.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when the downloaded agent template is empty or invalid.</exception>
-    /// <exception cref="Exception">Thrown when there is an error downloading the agent template.</exception>
-    public async Task<IAgent> CreateAgent(string name)
+    public async Task<IAgent> CreateAgent()
     {
         string agentTemplate;
-
-        var agentSettings = _agentSettings.First(x => x.Name == name);
-        
+      
         try
         {
-            agentTemplate = await storageRepository.DownloadTextBlobAsync(agentSettings.PromptTemplateName, InfrastructureConstants.AgentTemplatesContainerName);
+            agentTemplate = await storageRepository.DownloadTextBlobAsync("chat-assistant.yaml", InfrastructureConstants.AgentTemplatesContainerName);
 
         }
         catch (Exception exception)
@@ -46,21 +35,25 @@ public class AgentFactory(IAzureStorageRepository storageRepository, Kernel kern
             throw new InvalidOperationException($"The downloaded agent template is empty or invalid : {InfrastructureConstants.ChatAgentTemplateName}");
         }
 
-        var templateConfig = KernelFunctionYaml.ToPromptTemplateConfig(agentTemplate);
+        var factory = new KernelPromptTemplateFactory();
 
-        var promptExecutionSettings = new OpenAIPromptExecutionSettings
+        var promptTemplate = factory.Create(new PromptTemplateConfig(agentTemplate));
+
+        var rendered = await promptTemplate.RenderAsync(kernel);
+
+        var chatClient = new AzureOpenAIClient(new Uri(_settings.EndPoint),
+                new ApiKeyCredential(
+                    _settings.ApiKey))
+            .GetChatClient(_settings.DeploymentName);
+    
+        var agent = chatClient.CreateAIAgent(new ChatClientAgentOptions
         {
-            ServiceId = InfrastructureConstants.ChatAgentModeServiceId
-        };
+            Instructions = rendered,
 
-        var agent = new ChatCompletionAgent(templateConfig, new KernelPromptTemplateFactory())
-        {
-            Kernel = kernel,
-            Arguments = new KernelArguments(promptExecutionSettings)
-        };
+            ChatMessageStoreFactory = ctx =>
+                new InMemoryChatMessageStore(ctx.SerializedState, ctx.JsonSerializerOptions)
+        });
 
-        var streamingAgent = new BaseStreamingAgent(agent);
-
-        return new Agent(streamingAgent);
+        return new Agent(agent);
     }
 }
