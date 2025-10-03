@@ -1,11 +1,12 @@
 ﻿using System.Text;
 using Agents.Conversation.Common;
-using Application.Interfaces;
+using Agents.Infrastructure.Interfaces;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Microsoft.Extensions.Logging;
 
-namespace Agents.Conversation.Storage;
+namespace Agents.Infrastructure.Storage;
 
 public class AzureStorageRepository(BlobServiceClient blobServiceClient, ILogger<AzureStorageRepository> logger)
     : IAzureStorageRepository

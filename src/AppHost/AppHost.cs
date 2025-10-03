@@ -37,5 +37,8 @@ WithReference(blobs).WaitFor(storage)
     .WithReference(serviceBus).WaitFor(queue);
 
 
+builder.AddProject<Projects.Agents_Summarizer>("agents-summarizer");
+
+
 var build = builder.Build();
 build.Run();

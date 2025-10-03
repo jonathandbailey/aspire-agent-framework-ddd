@@ -1,4 +1,6 @@
-﻿namespace Agents.Conversation.Extensions;
+﻿using Microsoft.Extensions.Configuration;
+
+namespace Agents.Infrastructure.Extensions;
 
 public static class SettingsExtensions
 {

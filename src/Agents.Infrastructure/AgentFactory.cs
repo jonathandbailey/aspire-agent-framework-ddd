@@ -1,21 +1,22 @@
-﻿using Agents.Conversation.Settings;
-using Application.Interfaces;
-using Azure.AI.OpenAI;
+﻿using Azure.AI.OpenAI;
 using Microsoft.Agents.AI;
 using Microsoft.SemanticKernel;
 using OpenAI;
 using System.ClientModel;
-using Agents.Conversation.Interfaces;
+using Agents.Conversation;
 using Microsoft.Extensions.Options;
 using Agents.Conversation.Common;
+using Agents.Infrastructure.Interfaces;
+using Agents.Infrastructure.Settings;
+using Microsoft.Extensions.Logging;
 
-namespace Agents.Conversation;
+namespace Agents.Infrastructure;
 
 public class AgentFactory(IAzureStorageRepository storageRepository, Kernel kernel, ILogger<AgentFactory> logger, IOptions<LanguageModelSettings> settings) : IAgentFactory
 {
     private readonly LanguageModelSettings _settings = settings.Value;
 
-    public async Task<IAgent> CreateAgent()
+    public async Task<IAgent> CreateAgent(string templateName)
     {
         string agentTemplate;
       

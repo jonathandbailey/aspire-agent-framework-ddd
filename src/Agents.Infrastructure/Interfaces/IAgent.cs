@@ -1,6 +1,6 @@
-﻿using Agents.Conversation.Dto;
+﻿using Agents.Infrastructure.Dto;
 
-namespace Application.Interfaces;
+namespace Agents.Infrastructure.Interfaces;
 
 public interface IAgent
 {

@@ -1,4 +1,4 @@
-﻿namespace Agents.Conversation.Dto;
+﻿namespace Agents.Infrastructure.Dto;
 
 public record ConversationAgentMessage(Guid UserId, Guid ExchangeId, Guid ConversationId, List<Message> Messages);
 

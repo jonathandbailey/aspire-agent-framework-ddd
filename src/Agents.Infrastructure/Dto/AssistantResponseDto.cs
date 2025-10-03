@@ -1,4 +1,4 @@
-namespace Agents.Conversation.Dto;
+namespace Agents.Infrastructure.Dto;
 
 public class AssistantResponseDto
 {

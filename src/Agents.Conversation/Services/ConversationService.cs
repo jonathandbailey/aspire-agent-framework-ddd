@@ -1,8 +1,8 @@
-﻿using Agents.Conversation.Dto;
-using Agents.Conversation.Interfaces;
+﻿using Agents.Conversation.Interfaces;
 using Azure.Messaging.ServiceBus;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Agents.Infrastructure.Dto;
 
 namespace Agents.Conversation.Services;
 

@@ -1,9 +1,9 @@
-﻿using Agents.Conversation.Dto;
-using Agents.Conversation.Extensions;
-using Application.Interfaces;
+﻿using Agents.Conversation.Extensions;
+using Agents.Infrastructure.Dto;
+using Agents.Infrastructure.Interfaces;
 using Microsoft.Agents.AI;
 
-namespace Agents.Conversation;
+namespace Agents.Infrastructure;
 
 public class Agent(AIAgent agent) : IAgent
 {

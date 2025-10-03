@@ -1,4 +1,4 @@
-﻿namespace Agents.Conversation.Settings;
+﻿namespace Agents.Infrastructure.Settings;
 
 public class AgentSettings
 {

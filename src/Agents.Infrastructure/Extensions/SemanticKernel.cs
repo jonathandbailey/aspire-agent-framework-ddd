@@ -1,8 +1,9 @@
 ﻿using Agents.Conversation.Common;
-using Agents.Conversation.Settings;
+using Agents.Infrastructure.Settings;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 
-namespace Agents.Conversation.Extensions;
+namespace Agents.Infrastructure.Extensions;
 
 public static class SemanticKernel
 {

@@ -1,37 +1,20 @@
-using Agents.Conversation;
-using Agents.Conversation.Common;
-using Agents.Conversation.Extensions;
 using Agents.Conversation.Interfaces;
 using Agents.Conversation.Services;
-using Agents.Conversation.Settings;
-using Agents.Conversation.Storage;
-using Application.Interfaces;
-using Microsoft.Extensions.Azure;
+using Agents.Infrastructure.Extensions;
+using Agents.Infrastructure.Interfaces;
+using Agents.Infrastructure.Services;
 using ServiceDefaults;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddAzureClients(azure =>
-{
-    azure.AddServiceBusClient(builder.Configuration.GetConnectionString("messaging"));
-    azure.AddBlobServiceClient(builder.Configuration.GetConnectionString(InfrastructureConstants.BlobStorageConnectionName));
-});
-
 builder.AddServiceDefaults();
-builder.Services.AddSingleton<IAgentFactory, AgentFactory>();
-builder.Services.AddSingleton<IAzureStorageRepository, AzureStorageRepository>();
+
+builder.Services.AddInfrastructureServices(builder.Configuration);
+
 builder.Services.AddSingleton<IAgentService, AgentService>();
 builder.Services.AddSingleton<IConversationService, ConversationService>();
 
-builder.Services.Configure<LanguageModelSettings>((options) => 
-    builder.Configuration.GetSection(InfrastructureConstants.LanguageModelSettingsKey).Bind(options));
-
-
-var modelSettings = builder.Configuration.GetRequiredSetting<LanguageModelSettings>(InfrastructureConstants.LanguageModelSettingsKey);
-
-builder.Services.AddSemanticKernel(modelSettings);
-
-builder.Services.AddHostedService<Worker>();
+builder.Services.AddHostedService<MessagingWorker>();
 
 var host = builder.Build();
 host.Run();

@@ -1,4 +1,4 @@
-﻿namespace Application.Interfaces;
+﻿namespace Agents.Infrastructure.Interfaces;
 
 public interface IAzureStorageRepository
 {

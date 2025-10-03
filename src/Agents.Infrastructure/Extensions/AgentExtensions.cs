@@ -1,4 +1,4 @@
-﻿using Agents.Conversation.Dto;
+﻿using Agents.Infrastructure.Dto;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using AgentThread = Microsoft.Agents.AI.AgentThread;
