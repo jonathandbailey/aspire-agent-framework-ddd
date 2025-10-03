@@ -2,11 +2,8 @@
 
 [![.NET](https://github.com/jonathandbailey/the-infinite-loop-semantic-kernel/actions/workflows/dotnet.yml/badge.svg)](https://github.com/jonathandbailey/the-infinite-loop-semantic-kernel/actions/workflows/dotnet.yml)
 
-This is the application and code sample for a blog series : [Semantic Kernel, Part 1 : Beyond the Console App](https://www.theinfiniteloop.dev/semantic-kernel-part-1-beyond-the-console-app/)
 
-I wanted to move beyond the console apps I've built with Semantic Kernel, and build more scalable, flexible applications I can deploy on Azure. 
-
-The architecture is inspired by the work I've done on DDD projects and Jason Taylors [Clean Architecture](https://www.theinfiniteloop.dev/semantic-kernel-part-1-beyond-the-console-app/)
+The architecture is inspired by the work I've done on DDD projects and Jason Taylors [Clean Architecture](https://github.com/jasontaylordev/CleanArchitecture)
 
 ## Running the Application
 
