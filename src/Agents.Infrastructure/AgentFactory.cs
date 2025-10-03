@@ -22,18 +22,18 @@ public class AgentFactory(IAzureStorageRepository storageRepository, Kernel kern
       
         try
         {
-            agentTemplate = await storageRepository.DownloadTextBlobAsync("chat-assistant.yaml", InfrastructureConstants.AgentTemplatesContainerName);
+            agentTemplate = await storageRepository.DownloadTextBlobAsync(templateName, InfrastructureConstants.AgentTemplatesContainerName);
 
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "Failed to load agent template : {ChatAgentTemplateName}", InfrastructureConstants.ChatAgentTemplateName);
+            logger.LogError(exception, "Failed to load agent template : {ChatAgentTemplateName}", templateName);
             throw;
         }
 
         if (string.IsNullOrWhiteSpace(agentTemplate))
         {
-            throw new InvalidOperationException($"The downloaded agent template is empty or invalid : {InfrastructureConstants.ChatAgentTemplateName}");
+            throw new InvalidOperationException($"The downloaded agent template is empty or invalid : {templateName}");
         }
 
         var factory = new KernelPromptTemplateFactory();

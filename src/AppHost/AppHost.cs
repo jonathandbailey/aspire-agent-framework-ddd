@@ -47,7 +47,7 @@ builder.AddProject<Projects.Agents_Conversation>("agents-conversation").WithRefe
     .WithEnvironment("Topics__User", userTopic);
 
 
-builder.AddProject<Projects.Agents_Summarizer>("agents-summarizer")
+builder.AddProject<Projects.Agents_Summarizer>("agents-summarizer").WithReference(blobs).WaitFor(storage)
     .WithReference(serviceBus).WaitFor(agentSummarizerQueue)
     .WithEnvironment("Queues__Agent", summarizerQueue)
     .WithEnvironment("Topics__User", userTopic);

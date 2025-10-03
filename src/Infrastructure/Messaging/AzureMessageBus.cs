@@ -9,6 +9,7 @@ public class AzureMessageBus(ServiceBusClient serviceBusClient) : IMessageBus
 {
     private readonly ServiceBusSender _sender = serviceBusClient.CreateSender("user-topic");
     private readonly ServiceBusSender _senderQueue = serviceBusClient.CreateSender("agent-conversation-queue");
+    private readonly ServiceBusSender _senderQueueTitle = serviceBusClient.CreateSender("agent-summarizer-queue");
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -37,5 +38,14 @@ public class AzureMessageBus(ServiceBusClient serviceBusClient) : IMessageBus
         var serviceBusMessage = new ServiceBusMessage(serializedConversation);
    
         await _senderQueue.SendMessageAsync(serviceBusMessage);
+    }
+
+    public async Task SendAsyncToSummarize<T>(T payload)
+    {
+        var serializedConversation = JsonSerializer.Serialize(payload, SerializerOptions);
+
+        var serviceBusMessage = new ServiceBusMessage(serializedConversation);
+
+        await _senderQueueTitle.SendMessageAsync(serviceBusMessage);
     }
 }
