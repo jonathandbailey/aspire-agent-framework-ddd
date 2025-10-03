@@ -7,8 +7,8 @@ namespace Infrastructure.Messaging;
 
 public class AzureMessageBus(ServiceBusClient serviceBusClient) : IMessageBus
 {
-    private readonly ServiceBusSender _sender = serviceBusClient.CreateSender("topic");
-    private readonly ServiceBusSender _senderQueue = serviceBusClient.CreateSender("queue");
+    private readonly ServiceBusSender _sender = serviceBusClient.CreateSender("user-topic");
+    private readonly ServiceBusSender _senderQueue = serviceBusClient.CreateSender("agent-conversation-queue");
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {

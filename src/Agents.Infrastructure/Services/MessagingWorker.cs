@@ -1,7 +1,9 @@
 using Agents.Infrastructure.Interfaces;
+using Agents.Infrastructure.Settings;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Agents.Infrastructure.Services;
 
@@ -11,11 +13,11 @@ public class MessagingWorker : BackgroundService
     private readonly IAgentService _agentService;
     private readonly ServiceBusProcessor _processor;
 
-    public MessagingWorker(ServiceBusClient serviceBusClient, ILogger<MessagingWorker> logger, IAgentService agentService)
+    public MessagingWorker(ServiceBusClient serviceBusClient, ILogger<MessagingWorker> logger, IAgentService agentService, IOptions<QueueSettings> settings)
     {
         _logger = logger;
         _agentService = agentService;
-        _processor = serviceBusClient.CreateProcessor("queue", new ServiceBusProcessorOptions());
+        _processor = serviceBusClient.CreateProcessor(settings.Value.Agent, new ServiceBusProcessorOptions());
         _processor.ProcessMessageAsync += OnMessageAsync;
         _processor.ProcessErrorAsync += ErrorHandler;
     }

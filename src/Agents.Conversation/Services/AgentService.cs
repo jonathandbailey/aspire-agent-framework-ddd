@@ -6,13 +6,15 @@ using System.Text.Json.Serialization;
 using Agents.Conversation.Common;
 using Agents.Infrastructure.Dto;
 using Agents.Infrastructure.Interfaces;
+using Agents.Infrastructure.Settings;
+using Microsoft.Extensions.Options;
 
 namespace Agents.Conversation.Services;
 
-public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agentFactory, IConversationService conversationService)
+public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agentFactory, IConversationService conversationService, IOptions<TopicSettings> settings)
     : IAgentService
 {
-    private readonly ServiceBusSender _userStreamSender = serviceBusClient.CreateSender("topic");
+    private readonly ServiceBusSender _userStreamSender = serviceBusClient.CreateSender(settings.Value.User);
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -34,7 +36,7 @@ public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agent
         await ProcessAsync(agentConversationRequest);
     }
 
-    public async Task<AssistantResponseDto> ProcessAsync(ConversationAgentMessage agentConversationRequest)
+    private async Task ProcessAsync(ConversationAgentMessage agentConversationRequest)
     {
         var frameworkAgent = await agentFactory.CreateAgent(InfrastructureConstants.ChatAgentTemplateName);
 
@@ -62,7 +64,5 @@ public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agent
 
         await conversationService.PublishDomainUpdate(agentConversationRequest.UserId, stringBuilder.ToString(),
             agentConversationRequest.ConversationId, agentConversationRequest.ExchangeId);
-
-        return new AssistantResponseDto() { Content = stringBuilder.ToString() };
     }
 }

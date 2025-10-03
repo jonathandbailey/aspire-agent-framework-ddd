@@ -3,7 +3,7 @@ using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using AgentThread = Microsoft.Agents.AI.AgentThread;
 
-namespace Agents.Conversation.Extensions;
+namespace Agents.Infrastructure.Extensions;
 
 public static class AgentExtensions
 {

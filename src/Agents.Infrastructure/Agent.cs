@@ -1,5 +1,5 @@
-﻿using Agents.Conversation.Extensions;
-using Agents.Infrastructure.Dto;
+﻿using Agents.Infrastructure.Dto;
+using Agents.Infrastructure.Extensions;
 using Agents.Infrastructure.Interfaces;
 using Microsoft.Agents.AI;
 

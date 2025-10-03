@@ -8,10 +8,18 @@ const string apiName = "api";
 var storage = builder.AddAzureStorageServices();
 
 var serviceBus = builder.AddServiceBusServices();
-var topic = serviceBus.AddServiceBusTopic("topic");
-var queue = serviceBus.AddServiceBusQueue("queue");
+var userTopic = "user-topic";
 
-var conversationDomainQueue = serviceBus.AddServiceBusQueue("conversation-domain-queue");
+var topic = serviceBus.AddServiceBusTopic(userTopic);
+
+var conversationQueue = "agent-conversation-queue";
+var agentConversationQueue = serviceBus.AddServiceBusQueue(conversationQueue);
+
+var summarizerQueue = "agent-summarizer-queue";
+var agentSummarizerQueue = serviceBus.AddServiceBusQueue(summarizerQueue);
+
+var domainQueue = "conversation-domain-queue";
+var conversationDomainQueue = serviceBus.AddServiceBusQueue(domainQueue);
 
 topic.AddServiceBusSubscription("subscription")
     .WithProperties(subscription =>
@@ -32,12 +40,17 @@ api.WithReference(ui);
 hub.WithReference(ui);
 
 
-builder.AddProject<Projects.Agents_Conversation>("agents-conversation").
-WithReference(blobs).WaitFor(storage)
-    .WithReference(serviceBus).WaitFor(queue);
+builder.AddProject<Projects.Agents_Conversation>("agents-conversation").WithReference(blobs).WaitFor(storage)
+    .WithReference(serviceBus).WaitFor(agentConversationQueue)
+    .WithEnvironment("Queues__Agent", conversationQueue)
+    .WithEnvironment("Queues__Domain", domainQueue)
+    .WithEnvironment("Topics__User", userTopic);
 
 
-builder.AddProject<Projects.Agents_Summarizer>("agents-summarizer");
+builder.AddProject<Projects.Agents_Summarizer>("agents-summarizer")
+    .WithReference(serviceBus).WaitFor(agentSummarizerQueue)
+    .WithEnvironment("Queues__Agent", summarizerQueue)
+    .WithEnvironment("Topics__User", userTopic);
 
 
 var build = builder.Build();

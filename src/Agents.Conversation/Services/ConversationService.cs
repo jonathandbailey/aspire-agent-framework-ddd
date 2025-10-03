@@ -1,14 +1,16 @@
 ﻿using Agents.Conversation.Interfaces;
+using Agents.Infrastructure.Dto;
+using Agents.Infrastructure.Settings;
 using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Agents.Infrastructure.Dto;
 
 namespace Agents.Conversation.Services;
 
-public class ConversationService(ServiceBusClient serviceBusClient) : IConversationService
+public class ConversationService(ServiceBusClient serviceBusClient, IOptions<QueueSettings> settings) : IConversationService
 {
-    private readonly ServiceBusSender _conversationDomainSender = serviceBusClient.CreateSender("conversation-domain-queue");
+    private readonly ServiceBusSender _conversationDomainSender = serviceBusClient.CreateSender(settings.Value.Domain);
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
