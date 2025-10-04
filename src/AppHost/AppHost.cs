@@ -1,5 +1,6 @@
 
 using AppHost.Extensions;
+using Aspire.Hosting.Azure;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -18,8 +19,8 @@ var agentConversationQueue = serviceBus.AddServiceBusQueue(conversationQueue);
 var summarizerQueue = "agent-summarizer-queue";
 var agentSummarizerQueue = serviceBus.AddServiceBusQueue(summarizerQueue);
 
-var domainQueue = "conversation-domain-queue";
-var conversationDomainQueue = serviceBus.AddServiceBusQueue(domainQueue);
+var domainTopic = "conversation-domain-topic";
+var conversationDomainTopic = serviceBus.AddServiceBusTopic(domainTopic);
 
 topic.AddServiceBusSubscription("subscription")
     .WithProperties(subscription =>
@@ -27,10 +28,24 @@ topic.AddServiceBusSubscription("subscription")
         subscription.MaxDeliveryCount = 10;
     });
 
+conversationDomainTopic.AddServiceBusSubscription("exchange-complete-subscription")
+    .WithProperties(subscription =>
+    {
+        subscription.MaxDeliveryCount = 10;
+        subscription.Rules.Add(
+            new AzureServiceBusRule("ExchangeCompleteRule")
+            {
+                CorrelationFilter = new AzureServiceBusCorrelationFilter
+                {
+                    Subject = "ExchangeComplete"
+                }
+            });
+    });
+
 var blobs = builder.AddAzureBlobsServices(storage);
 
 var api = builder.AddProject<Projects.Api>(apiName).WithReference(blobs).WaitFor(storage)
-    .WithReference(serviceBus).WaitFor(topic).WaitFor(conversationDomainQueue);
+    .WithReference(serviceBus).WaitFor(topic).WaitFor(conversationDomainTopic);
 
 var hub = builder.AddProject<Projects.Api_Hub>("api-hub").WithReference(serviceBus).WaitFor(topic);
 
@@ -43,7 +58,7 @@ hub.WithReference(ui);
 builder.AddProject<Projects.Agents_Conversation>("agents-conversation").WithReference(blobs).WaitFor(storage)
     .WithReference(serviceBus).WaitFor(agentConversationQueue)
     .WithEnvironment("Queues__Agent", conversationQueue)
-    .WithEnvironment("Queues__Domain", domainQueue)
+    .WithEnvironment("Topics__Domain", domainTopic)
     .WithEnvironment("Topics__User", userTopic);
 
 

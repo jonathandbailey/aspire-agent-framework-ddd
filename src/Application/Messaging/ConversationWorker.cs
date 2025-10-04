@@ -28,7 +28,7 @@ public class ConversationWorker : BackgroundService
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
-        _processor = serviceBusClient.CreateProcessor("conversation-domain-queue", new ServiceBusProcessorOptions());
+        _processor = serviceBusClient.CreateProcessor("conversation-domain-topic", "exchange-complete-subscription");
         _processor.ProcessMessageAsync += OnMessageAsync;
         _processor.ProcessErrorAsync += ErrorHandler;
     }

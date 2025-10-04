@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace Agents.Conversation.Services;
 
-public class ConversationService(ServiceBusClient serviceBusClient, IOptions<QueueSettings> settings) : IConversationService
+public class ConversationService(ServiceBusClient serviceBusClient, IOptions<TopicSettings> settings) : IConversationService
 {
     private readonly ServiceBusSender _conversationDomainSender = serviceBusClient.CreateSender(settings.Value.Domain);
 
@@ -27,6 +27,6 @@ public class ConversationService(ServiceBusClient serviceBusClient, IOptions<Que
 
         var serializedDomainMessage = JsonSerializer.Serialize(message, SerializerOptions);
 
-        await _conversationDomainSender.SendMessageAsync(new ServiceBusMessage(serializedDomainMessage));
+        await _conversationDomainSender.SendMessageAsync(new ServiceBusMessage(serializedDomainMessage){ Subject = "ExchangeComplete" });
     }
 }
