@@ -13,6 +13,7 @@ namespace Agents.Summarizer.Services;
 public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agentFactory, IOptions<TopicSettings> settings) : IAgentService
 {
     private readonly ServiceBusSender _userStreamSender = serviceBusClient.CreateSender(settings.Value.User);
+    private readonly ServiceBusSender _conversationDomainSender = serviceBusClient.CreateSender(settings.Value.Domain);
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -53,5 +54,12 @@ public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agent
 
             await _userStreamSender.SendMessageAsync(serviceBusMessage);
         }
+
+        var titleUpdatedMessage = new ConversationTitleUpdatedMessage(
+            agentConversationRequest.UserId, agentConversationRequest.ConversationId, stringBuilder.ToString());
+
+        var serializedDomainMessage = JsonSerializer.Serialize(titleUpdatedMessage, SerializerOptions);
+
+        await _conversationDomainSender.SendMessageAsync(new ServiceBusMessage(serializedDomainMessage) { Subject = "TitleUpdate" });
     }
 }

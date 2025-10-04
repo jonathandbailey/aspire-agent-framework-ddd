@@ -42,6 +42,20 @@ conversationDomainTopic.AddServiceBusSubscription("exchange-complete-subscriptio
             });
     });
 
+conversationDomainTopic.AddServiceBusSubscription("title-update-subscription")
+    .WithProperties(subscription =>
+    {
+        subscription.MaxDeliveryCount = 10;
+        subscription.Rules.Add(
+            new AzureServiceBusRule("TitleUpdateRule")
+            {
+                CorrelationFilter = new AzureServiceBusCorrelationFilter
+                {
+                    Subject = "TitleUpdate"
+                }
+            });
+    });
+
 var blobs = builder.AddAzureBlobsServices(storage);
 
 var api = builder.AddProject<Projects.Api>(apiName).WithReference(blobs).WaitFor(storage)
@@ -65,6 +79,7 @@ builder.AddProject<Projects.Agents_Conversation>("agents-conversation").WithRefe
 builder.AddProject<Projects.Agents_Summarizer>("agents-summarizer").WithReference(blobs).WaitFor(storage)
     .WithReference(serviceBus).WaitFor(agentSummarizerQueue)
     .WithEnvironment("Queues__Agent", summarizerQueue)
+    .WithEnvironment("Topics__Domain", domainTopic)
     .WithEnvironment("Topics__User", userTopic);
 
 
