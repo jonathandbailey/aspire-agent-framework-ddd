@@ -13,3 +13,5 @@ public sealed record ConversationExchange(
 public sealed record ConversationMessage(Guid Id, string Role, string Content);
 
 public sealed record ConversationSummaryItem(Guid Id, string Title);
+
+public record ConversationDomainMessage(Guid UserId, string Content, Guid ConversationId, Guid ExchangeId);

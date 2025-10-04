@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Application.Events.Integration;
+﻿using Application.Events.Integration;
 using Application.Interfaces;
 using Domain.Conversations;
 using Domain.Interfaces;
@@ -7,10 +6,9 @@ using MediatR;
 
 namespace Application.Conversations.Commands;
 
-public class StartConversationExchangeCommandHandler(IConversationRepository conversationRepository,
-    IAgentFactory agentFactory, 
-    IConversationDomainService conversationDomainService,
-        IStreamingEventPublisher publisher
+public class StartConversationExchangeCommandHandler(IConversationRepository conversationRepository, 
+    IMediator mediator,
+    IConversationDomainService conversationDomainService
     ) : IRequestHandler<StartConversationExchangeCommand>
 {
     public async Task Handle(StartConversationExchangeCommand request, CancellationToken cancellationToken)
@@ -20,23 +18,11 @@ public class StartConversationExchangeCommandHandler(IConversationRepository con
         conversation.StartConversationExchange(request.Message, ExchangeId.FromGuid(request.ExchangeId));
 
         await conversationRepository.SaveAsync(conversation);
-
-        var assistant = await agentFactory.CreateAgent("Conversation");
-
+    
         var messages = conversationDomainService.GetMessages(conversation);
 
-        var stringBuilder = new StringBuilder();
-
-        await foreach (var response in assistant.InvokeStreamAsync(messages))
-        {
-            await publisher.Send(new UserStreamingApplicationEvent(conversation.UserId, request.ExchangeId, conversation.Id, response.Content));
-
-            stringBuilder.Append(response.Content);
-        }
-    
-        conversation.CompleteConversationExchange(ExchangeId.FromGuid(request.ExchangeId), stringBuilder.ToString());
-
-        await conversationRepository.SaveAsync(conversation);
+        await mediator.Send(new ConversationAgentEvent(conversation.UserId, request.ExchangeId, conversation.Id,
+            messages), cancellationToken);
     }
 }
 

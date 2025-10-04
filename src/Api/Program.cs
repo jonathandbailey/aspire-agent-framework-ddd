@@ -2,6 +2,7 @@ using Api;
 using Api.Extensions;
 using Api.Middleware;
 using Application.Extensions;
+using Infrastructure.Agents.Extensions;
 using Infrastructure.Extensions;
 using ServiceDefaults;
 
@@ -17,6 +18,7 @@ builder.AddCorsPolicyFromServiceDiscovery();
 
 builder.Services.AddApiServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddAgentInfrastructureServices(builder.Configuration);
 
 builder.Services.AddApplicationServices();
 

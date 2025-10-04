@@ -1,8 +1,8 @@
 ﻿using Application.Dto;
 using Application.Interfaces;
 using Domain.Conversations;
-using Infrastructure.Extensions;
-using Infrastructure.Interfaces;
+using Infrastructure.Agents.Extensions;
+using Infrastructure.Agents.Interfaces;
 
 namespace Infrastructure.Agents;
 

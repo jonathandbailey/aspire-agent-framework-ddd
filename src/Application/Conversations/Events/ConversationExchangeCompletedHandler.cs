@@ -9,7 +9,7 @@ using System.Text;
 namespace Application.Conversations.Events;
 
 public class ConversationExchangeCompletedHandler(IConversationRepository conversationRepository, IConversationDomainService conversationDomainService,
-    IAgentFactory agentFactory, IStreamingEventPublisher publisher) : INotificationHandler<ConversationExchangeCompletedEvent>
+    IAgentFactory agentFactory, IMediator mediator) : INotificationHandler<ConversationExchangeCompletedEvent>
 {
     public async Task Handle(ConversationExchangeCompletedEvent request, CancellationToken cancellationToken)
     {
@@ -32,12 +32,12 @@ public class ConversationExchangeCompletedHandler(IConversationRepository conver
 
         var messages = conversationDomainService.GetMessages(conversation);
 
+        await mediator.Send(new ConversationTitleEvent(conversation.UserId.Value, conversation.Id, messages));
+
         var stringBuilder = new StringBuilder();
 
         await foreach (var response in agent.InvokeStreamAsync(messages))
         {
-            await publisher.Send(new ConversationTitleUpdateApplicationEvent(conversation.UserId, conversation.Id, response.Content));
-
             stringBuilder.Append(response.Content);
         }
 

@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using Api.Hub.Interfaces;
+﻿using Api.Hub.Interfaces;
 using Azure.Messaging.ServiceBus;
 
 namespace Api.Hub.Services;
@@ -16,7 +14,7 @@ public class ConversationMessageWorker : BackgroundService, IAsyncDisposable
     {
         _messageRoutingService = messageRoutingService;
         _logger = logger;
-        _processor = serviceBusClient.CreateProcessor("topic", "subscription");
+        _processor = serviceBusClient.CreateProcessor("user-topic", "subscription");
         _processor.ProcessMessageAsync += OnMessageAsync;
         _processor.ProcessErrorAsync += ErrorHandler;
     }

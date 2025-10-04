@@ -30,6 +30,16 @@
 /src/Api.Hub/bin/Debug/net9.0
 /src/Api.Hub/obj
 /src/Api.Hub/Api.Hub.csproj.user
+/src/Infrastructure.Agents/bin/Debug/net9.0
+/src/Infrastructure.Agents/obj
+/src/Agents.Conversation/bin/Debug/net9.0
+/src/Agents.Conversation/obj
+/src/Agents.Conversation/Agents.Conversation.csproj.user
+/src/Agents.Infrastructure/bin/Debug/net9.0
+/src/Agents.Infrastructure/obj
+/src/Agents.Summarizer/bin/Debug/net9.0
+/src/Agents.Summarizer/obj
+/src/Agents.Summarizer/Agents.Summarizer.csproj.user
 /src/Agents.Conversation/bin/Debug/net9.0
 /src/Agents.Conversation/obj
 /src/Infrastructure.Agents/bin/Debug/net9.0
