@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Events.Integration;
 
-public class ConversationTitleEventHandler(IMessageBus messageBus, IConversationRepository conversationRepository) : 
+public class ConversationTitleEventHandler(IIntegrationMessaging messageBus, IConversationRepository conversationRepository) : 
     IRequestHandler<ConversationTitleEvent>, 
     IRequestHandler<ConversationTitleUpdatedEvent>
 {

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Events.Integration;
 
-public class StreamingApplicationEventHandler(IMessageBus messageBus) : 
+public class StreamingApplicationEventHandler(IIntegrationMessaging messageBus) : 
     IRequestHandler<UserStreamingApplicationEvent>,
     IRequestHandler<ConversationTitleUpdateApplicationEvent>
 {

@@ -12,4 +12,4 @@ public record ConversationTitleUpdatedMessage(Guid UserId, Guid ConversationId, 
 
 public record ConversationTitleMessage(Guid UserId, Guid ConversationId, List<Message> Messages);
 
-public record ConversationAgentMessage(Guid UserId, Guid ExchangeId, Guid ConversationId, List<Message> Messages);
+public record ConversationExchangeStartedMessage(Guid UserId, Guid ExchangeId, Guid ConversationId, List<Message> Messages);

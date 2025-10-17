@@ -1,6 +1,4 @@
 ﻿using Application.Behaviours;
-using Application.Interfaces;
-using Application.Services;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -19,9 +17,7 @@ public static class ApplicationExtensions
         });
 
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-
-        services.AddScoped<IStreamingEventPublisher, StreamingEventPublisher>();
-
+    
         services.AddScoped<IConversationDomainService, ConversationDomainService>();
 
         return services;

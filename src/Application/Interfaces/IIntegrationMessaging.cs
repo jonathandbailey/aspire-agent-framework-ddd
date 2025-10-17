@@ -1,6 +1,6 @@
 ﻿namespace Application.Interfaces;
 
-public interface IMessageBus
+public interface IIntegrationMessaging
 {
     Task SendAsync<T>(T payload, string target);
     Task SendAsync<T>(T payload);

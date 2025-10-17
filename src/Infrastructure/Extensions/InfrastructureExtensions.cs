@@ -8,7 +8,6 @@ using MediatR;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using IMessageBus = Application.Interfaces.IMessageBus;
 
 namespace Infrastructure.Extensions;
 
@@ -35,7 +34,7 @@ public static class InfrastructureExtensions
             azure.AddServiceBusClient( configuration.GetConnectionString("messaging"));
         });
 
-        services.AddScoped<IMessageBus, AzureMessageBus>();
+        services.AddScoped<IIntegrationMessaging, AzureMessageBus>();
 
         services.AddHostedService<IntegrationMessageWorker>();
 

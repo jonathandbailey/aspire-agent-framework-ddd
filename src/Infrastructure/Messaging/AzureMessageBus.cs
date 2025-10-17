@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Infrastructure.Messaging;
 
-public class AzureMessageBus(ServiceBusClient serviceBusClient) : IMessageBus
+public class AzureMessageBus(ServiceBusClient serviceBusClient) : IIntegrationMessaging
 {
     private readonly ServiceBusSender _sender = serviceBusClient.CreateSender("user-topic");
     private readonly ServiceBusSender _senderQueue = serviceBusClient.CreateSender("agent-conversation-queue");
