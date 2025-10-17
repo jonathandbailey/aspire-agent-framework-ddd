@@ -1,4 +1,4 @@
-# Semantic Kernel Agents
+# Microsoft Agent Framework, Aspire and DDD
 
 [![.NET](https://github.com/jonathandbailey/the-infinite-loop-semantic-kernel/actions/workflows/dotnet.yml/badge.svg)](https://github.com/jonathandbailey/the-infinite-loop-semantic-kernel/actions/workflows/dotnet.yml)
 
