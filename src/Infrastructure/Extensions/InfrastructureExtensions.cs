@@ -26,8 +26,6 @@ public static class InfrastructureExtensions
 
             return new ConversationRepositoryDomainAdapter(mediator, repository);
         });
-
-
  
         services.AddScoped<IConversationQueries, ConversationQuerieses>();
 
@@ -38,6 +36,8 @@ public static class InfrastructureExtensions
         });
 
         services.AddScoped<IMessageBus, AzureMessageBus>();
+
+        services.AddHostedService<IntegrationMessageWorker>();
 
         services.Configure<AzureStorageSettings>((options)=> configuration.GetSection("AzureStorageSettings").Bind(options));
       
