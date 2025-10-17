@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Domain.Events;
 using Domain.Interfaces;
 using MediatR;
+using ConversationExchangeCompletedEvent = Domain.Events.ConversationExchangeCompletedEvent;
 
 namespace Application.Conversations.Events;
 

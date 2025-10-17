@@ -1,6 +1,4 @@
 ﻿using Application.Dto;
-using Application.Interfaces;
-using Application.Messaging;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,7 +13,7 @@ namespace Infrastructure.Messaging;
 public class IntegrationMessageWorker : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<ConversationWorker> _logger;
+    private readonly ILogger<IntegrationMessageWorker> _logger;
     private readonly ServiceBusProcessor _processor;
 
     private readonly ServiceBusProcessor _processorTitle;
@@ -29,7 +27,7 @@ public class IntegrationMessageWorker : BackgroundService
     };
 
     public IntegrationMessageWorker(ServiceBusClient serviceBusClient, IServiceProvider serviceProvider,
-        ILogger<ConversationWorker> logger)
+        ILogger<IntegrationMessageWorker> logger)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
@@ -44,7 +42,22 @@ public class IntegrationMessageWorker : BackgroundService
 
     private async Task OnMessageAsync(ProcessMessageEventArgs args)
     {
+        var message = JsonSerializer.Deserialize<ConversationDomainMessage>(args.Message.Body, SerializerOptions);
 
+        if (message == null)
+        {
+            throw new Exception("Failed to deserialize the Conversation Domain Message");
+        }
+
+        using var scope = _serviceProvider.CreateScope();
+
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        await mediator.Send(new ConversationExchangeCompletedEvent(message.UserId, message.Content,
+            message.ConversationId, message.ExchangeId));
+
+
+        await args.CompleteMessageAsync(args.Message);
     }
 
     private async Task ProcessorTitleOnProcessMessageAsync(ProcessMessageEventArgs args)
@@ -62,6 +75,9 @@ public class IntegrationMessageWorker : BackgroundService
 
         await mediator.Send(new ConversationTitleUpdatedEvent(messageContent.UserId, messageContent.ConversationId,
             messageContent.Content));
+
+
+        await args.CompleteMessageAsync(args.Message);
     }
 
     private Task _processorTitle_ProcessErrorAsync(ProcessErrorEventArgs arg)
@@ -78,7 +94,7 @@ public class IntegrationMessageWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        //await _processor.StartProcessingAsync(stoppingToken);
+        await _processor.StartProcessingAsync(stoppingToken);
         await _processorTitle.StartProcessingAsync(stoppingToken);
     }
 }
