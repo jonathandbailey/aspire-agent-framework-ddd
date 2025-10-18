@@ -18,6 +18,6 @@ public class ConversationExchangeCompletedHandler(IConversationRepository conver
 
         var messages = conversationDomainService.GetMessages(conversation);
 
-        await mediator.Send(new ConversationTitleEvent(conversation.UserId.Value, conversation.Id, messages), cancellationToken);
+        await mediator.Send(new ConversationTitleUpdateStartedIntegrationEvent(conversation.UserId.Value, conversation.Id, messages), cancellationToken);
     }
 }

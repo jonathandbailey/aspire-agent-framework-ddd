@@ -10,6 +10,6 @@ public record ConversationStreamingMessage(Guid UserId, string Message, Guid Con
 
 public record ConversationTitleUpdatedMessage(Guid UserId, Guid ConversationId, string Content);
 
-public record ConversationTitleMessage(Guid UserId, Guid ConversationId, List<Message> Messages);
+public record ConversationTitleUpdateStartedMessage(Guid UserId, Guid ConversationId, List<Message> Messages);
 
 public record ConversationExchangeStartedMessage(Guid UserId, Guid ExchangeId, Guid ConversationId, List<Message> Messages);

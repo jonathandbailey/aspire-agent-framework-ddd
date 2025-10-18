@@ -73,7 +73,7 @@ public class IntegrationMessageWorker : BackgroundService
 
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        await mediator.Send(new ConversationTitleUpdatedEvent(messageContent.UserId, messageContent.ConversationId,
+        await mediator.Send(new ConversationTitleUpdatedCompletedIntegrationEvent(messageContent.UserId, messageContent.ConversationId,
             messageContent.Content));
 
 
