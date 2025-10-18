@@ -9,7 +9,7 @@ public static class AgentExtensions
 {
     public static AgentThread ToAgentThread(this AgentThread thread, List<Message> messages)
     {
-        var store = thread.GetService<ChatMessageStore>();
+        var store = thread.GetService<ChatHistoryContextProvider>();
 
         if (store == null)
             throw new Exception("The current agent thread does not have a Chat Message Store registered as a service.");
@@ -20,14 +20,14 @@ public static class AgentExtensions
             {
                 var userChatMessage = new ChatMessage(ChatRole.User, message.Content);
 
-                store.AddMessagesAsync([userChatMessage]);
+                store.AddMessageAsync(userChatMessage);
             }
 
             if (message.Role == "assistant")
             {
                 var userChatMessage = new ChatMessage(ChatRole.Assistant, message.Content);
 
-                store.AddMessagesAsync([userChatMessage]);
+                store.AddMessageAsync(userChatMessage);
             }
         }
 

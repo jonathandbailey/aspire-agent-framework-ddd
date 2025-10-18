@@ -32,7 +32,7 @@ public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agent
             throw new Exception("Failed to deserialize conversation.");
         }
 
-        var frameworkAgent = await agentFactory.CreateAgent(InfrastructureConstants.TitleAssistantName);
+        var frameworkAgent = await agentFactory.CreateWrappedAgent(InfrastructureConstants.TitleAssistantName);
 
         var stringBuilder = new StringBuilder();
 
