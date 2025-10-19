@@ -1,27 +1,22 @@
 ﻿using Agents.Conversation.Common;
 using Agents.Conversation.Interfaces;
+using Agents.Conversation.State;
 using Agents.Conversation.Workflows;
 using Agents.Infrastructure.Dto;
-using Agents.Infrastructure.Extensions;
 using Agents.Infrastructure.Interfaces;
-using Agents.Infrastructure.Settings;
-using Azure;
 using Azure.Messaging.ServiceBus;
-using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
-using Microsoft.Extensions.Options;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Agents.Conversation.Extensions;
 
 namespace Agents.Conversation.Services;
 
-public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agentFactory, IConversationService conversationService, IOptions<TopicSettings> settings)
-    : IAgentService
+public class AgentService(IAgentFactory agentFactory, IConversationService conversationService) : IAgentService
 {
-    private readonly ServiceBusSender _userStreamSender = serviceBusClient.CreateSender(settings.Value.User);
-
+  
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,
@@ -42,36 +37,27 @@ public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agent
         await ProcessAsync(agentConversationRequest);
     }
 
-    private async Task ProcessAsync(ConversationAgentMessage agentConversationRequest)
+    private async Task ProcessAsync(ConversationAgentMessage request)
     {
         var agent = await agentFactory.CreateAgent(InfrastructureConstants.ChatAgentTemplateName);
 
         var stringBuilder = new StringBuilder();
 
-        var messages = new List<ChatMessage>();
+        var messages = request.Messages.Map();
 
-        foreach (var message in  agentConversationRequest.Messages)
-        {
-            if (message.Role == "user")
-            {
-                var userChatMessage = new ChatMessage(ChatRole.User, message.Content);
+        var conversationNode = new ConversationNode(agent);
+        var domainNode = new ConversationDomainNode(conversationService);
+        
+        var builder = new WorkflowBuilder(conversationNode);
 
-                messages.Add(userChatMessage);
-            }
+        builder.AddEdge(conversationNode, domainNode);
 
-            if (message.Role == "assistant")
-            {
-                var userChatMessage = new ChatMessage(ChatRole.Assistant, message.Content);
+        var workflow = await builder.BuildAsync<ConversationState>();
 
-                messages.Add(userChatMessage);
-            }
-        }
+        var state = new ConversationState(messages, request.UserId, request.ConversationId, request.ExchangeId,
+            string.Empty);
 
-        var workflowBuilder = new WorkflowBuilder(new ConversationNode(agent));
-
-        var workflow = await workflowBuilder.BuildAsync<List<ChatMessage>>();
-
-        var run = await InProcessExecution.StreamAsync(workflow, messages);
+        var run = await InProcessExecution.StreamAsync(workflow, state);
 
         await run.TrySendMessageAsync(new TurnToken(emitEvents: true));
        
@@ -82,24 +68,10 @@ public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agent
                 stringBuilder.Append(streamingEvent.Data);
 
                 var messageString = streamingEvent.Data?.ToString() ?? string.Empty;
-                var payload = new ConversationStreamingMessage(agentConversationRequest.UserId, messageString,
-                    agentConversationRequest.ConversationId, agentConversationRequest.ExchangeId);
 
-                var serializedConversation = JsonSerializer.Serialize(payload, SerializerOptions);
-
-                var serviceBusMessage = new ServiceBusMessage(serializedConversation)
-                {
-                    ApplicationProperties =
-                    {
-                        { "Target" , "UserConversationStream"}
-                    }
-                };
-
-                await _userStreamSender.SendMessageAsync(serviceBusMessage);
+                await conversationService.PublishUserStream(request.UserId, messageString,
+                    request.ConversationId, request.ExchangeId);
             }
         }
-
-        await conversationService.PublishDomainUpdate(agentConversationRequest.UserId, stringBuilder.ToString(),
-            agentConversationRequest.ConversationId, agentConversationRequest.ExchangeId);
     }
 }

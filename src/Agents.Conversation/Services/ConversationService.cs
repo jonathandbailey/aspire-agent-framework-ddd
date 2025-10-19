@@ -11,6 +11,7 @@ namespace Agents.Conversation.Services;
 public class ConversationService(ServiceBusClient serviceBusClient, IOptions<TopicSettings> settings) : IConversationService
 {
     private readonly ServiceBusSender _conversationDomainSender = serviceBusClient.CreateSender(settings.Value.Domain);
+    private readonly ServiceBusSender _userStreamSender = serviceBusClient.CreateSender(settings.Value.User);
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -28,5 +29,23 @@ public class ConversationService(ServiceBusClient serviceBusClient, IOptions<Top
         var serializedDomainMessage = JsonSerializer.Serialize(message, SerializerOptions);
 
         await _conversationDomainSender.SendMessageAsync(new ServiceBusMessage(serializedDomainMessage){ Subject = "ExchangeComplete" });
+    }
+
+    public async Task PublishUserStream(Guid userId, string content, Guid conversationId, Guid exchangeId)
+    {
+        var payload = new ConversationStreamingMessage(userId, content,
+            conversationId, exchangeId);
+
+        var serializedConversation = JsonSerializer.Serialize(payload, SerializerOptions);
+
+        var serviceBusMessage = new ServiceBusMessage(serializedConversation)
+        {
+            ApplicationProperties =
+            {
+                { "Target" , "UserConversationStream"}
+            }
+        };
+
+        await _userStreamSender.SendMessageAsync(serviceBusMessage);
     }
 }
