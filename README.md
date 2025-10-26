@@ -15,7 +15,7 @@ Based on Jason Taylors [Clean Architecture](https://github.com/jasontaylordev/Cl
 Explores and demonstrates how to build modular, distributed, and message-driven systems using:
 
 - **Microsoft Agent Framework** - Microsofts latest agent framework (semantic kernel + autogen)
-- **Microsoft Aspire ** — for orchestrating distributed microservices and cloud resources.  
+- **Microsoft Aspire** — for orchestrating distributed microservices and cloud resources.  
 - **Domain-Driven Design (DDD)** — to model clear domain boundaries, entities, and aggregates for managing user conversations.
 - **Azure Service Bus** — to handle distributed messaging between agents and Signal R Hubs
 - **SignalR Hubs** — for live, agent streaming communication with connected clients.  
@@ -39,11 +39,9 @@ Download the [Microsoft Azure Storage Explorer](https://azure.microsoft.com/en-u
 - Add the semantice kernel templates (in the assets folder) to the agent-templates blob
 
 ### SPA
-.NET Aspire will run the SPA application when you run the App Host, but it's won't do the first time install. 
-
-After cloning the repo, run npm install in the ui folder.
-
-You can access the UI from the .NET Aspire dashboard and then use the application.
+- .NET Aspire will run the SPA application when you run the App Host, but it's won't do the first time install. 
+- After cloning the repo, run npm install in the ui folder.
+- You can access the UI from the .NET Aspire dashboard and then use the application.
 
 
 
