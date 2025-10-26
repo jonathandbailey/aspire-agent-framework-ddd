@@ -1,14 +1,8 @@
-# Microsoft Agent Framework, Aspire and DDD
+# Microsoft Agent Framework, Aspire & Domain-Driven Design Exploration
 
 [![.NET](https://github.com/jonathandbailey/the-infinite-loop-semantic-kernel/actions/workflows/dotnet.yml/badge.svg)](https://github.com/jonathandbailey/the-infinite-loop-semantic-kernel/actions/workflows/dotnet.yml)
 
-
-The architecture is inspired by the work I've done on DDD projects and Jason Taylors [Clean Architecture](https://github.com/jasontaylordev/CleanArchitecture)
-
-
-
-
-# Microsoft Agent Framework, Aspire & Domain-Driven Design Exploration
+Based on Jason Taylors [Clean Architecture](https://github.com/jasontaylordev/CleanArchitecture)
 
 **Educational project exploring modern distributed application design using the Microsoft Aspire ecosystem, Domain-Driven Design (DDD), and Agentic patterns.**
 
@@ -16,16 +10,15 @@ The architecture is inspired by the work I've done on DDD projects and Jason Tay
 > This repository is a learning and experimentation space — not a production-ready framework.  
 > APIs, structure, and agents may change frequently.
 
----
-
 ## 🚀 Overview
 
-The **Aspire Agent Framework** demonstrates how to build modular, distributed, and message-driven systems using:
+Explores and demonstrates how to build modular, distributed, and message-driven systems using:
 
-- **Microsoft Aspire Framework** — for orchestrating distributed microservices and cloud resources.  
+- **Microsoft Agent Framework** - Microsofts latest agent framework (semantic kernel + autogen)
+- **Microsoft Aspire ** — for orchestrating distributed microservices and cloud resources.  
 - **Domain-Driven Design (DDD)** — to model clear domain boundaries, entities, and aggregates for managing user conversations.
 - **Azure Service Bus** — to handle distributed messaging between agents and Signal R Hubs
-- **SignalR Hubs** — for live, streaming communication with connected clients.  
+- **SignalR Hubs** — for live, agent streaming communication with connected clients.  
 - **React UI** — lightweight, throwaway demo frontend for visualizing agent interactions.
 
 This project serves as a **sandbox** for exploring architectural principles and integration patterns in a modern .NET distributed environment.
