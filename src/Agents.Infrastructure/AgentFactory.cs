@@ -5,6 +5,7 @@ using OpenAI;
 using System.ClientModel;
 using Microsoft.Extensions.Options;
 using Agents.Conversation.Common;
+using Agents.Infrastructure.Common;
 using Agents.Infrastructure.Interfaces;
 using Agents.Infrastructure.Settings;
 using Microsoft.Extensions.Logging;

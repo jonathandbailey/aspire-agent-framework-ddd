@@ -1,4 +1,4 @@
-﻿namespace Agents.Conversation.Common;
+﻿namespace Agents.Infrastructure.Common;
 
 public static class InfrastructureConstants
 {
@@ -6,9 +6,9 @@ public static class InfrastructureConstants
 
     public const string BlobStorageConnectionName = "blobs";
 
-    public const string ChatAgentTemplateName = "chat-assistant.yaml";
+    public const string ConversationAgentTemplateName = "conversation-agent.yaml";
 
-    public const string TitleAssistantName = "title-assistant.yaml";
+    public const string SummarizerAgentTemplateName = "summarizer-agent.yaml";
 
     public const string AgentTemplatesContainerName = "agent-templates";
 

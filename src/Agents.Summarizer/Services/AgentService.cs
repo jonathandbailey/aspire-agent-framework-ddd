@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Agents.Conversation.Common;
+using Agents.Infrastructure.Common;
 
 namespace Agents.Summarizer.Services;
 
@@ -32,7 +33,7 @@ public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agent
             throw new Exception("Failed to deserialize conversation.");
         }
 
-        var frameworkAgent = await agentFactory.CreateWrappedAgent(InfrastructureConstants.TitleAssistantName);
+        var frameworkAgent = await agentFactory.CreateWrappedAgent(InfrastructureConstants.SummarizerAgentTemplateName);
 
         var stringBuilder = new StringBuilder();
 

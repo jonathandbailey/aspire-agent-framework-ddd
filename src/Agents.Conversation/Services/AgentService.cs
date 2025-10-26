@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Agents.Conversation.Extensions;
+using Agents.Infrastructure.Common;
 
 namespace Agents.Conversation.Services;
 
@@ -39,7 +40,7 @@ public class AgentService(IAgentFactory agentFactory, IConversationService conve
 
     private async Task ProcessAsync(ConversationAgentMessage request)
     {
-        var agent = await agentFactory.CreateAgent(InfrastructureConstants.ChatAgentTemplateName);
+        var agent = await agentFactory.CreateAgent(InfrastructureConstants.ConversationAgentTemplateName);
 
         var stringBuilder = new StringBuilder();
 
