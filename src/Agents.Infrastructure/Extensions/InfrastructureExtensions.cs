@@ -9,8 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Agents.Infrastructure.Extensions;
 
-public static  class InfrastructureExtensions
+public static class InfrastructureExtensions
 {
+    private const string ApiInfrastructureHttpClientName = "ApiInfrastructure";
+
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<LanguageModelSettings>((options) =>
@@ -22,7 +24,6 @@ public static  class InfrastructureExtensions
         services.Configure<TopicSettings>(
             configuration.GetSection("Topics"));
 
-
         var modelSettings = configuration.GetRequiredSetting<LanguageModelSettings>(InfrastructureConstants.LanguageModelSettingsKey);
 
         services.AddSemanticKernel(modelSettings);
@@ -31,6 +32,18 @@ public static  class InfrastructureExtensions
         {
             azure.AddServiceBusClient(configuration.GetConnectionString("messaging"));
             azure.AddBlobServiceClient(configuration.GetConnectionString(InfrastructureConstants.BlobStorageConnectionName));
+        });
+
+        // Register named HttpClient for API Infrastructure with service discovery
+        services.AddHttpClient(ApiInfrastructureHttpClientName, (serviceProvider, client) =>
+        {
+            var apiInfraSettings = configuration["services:api-infrastructure:http:0"]
+                ?? configuration["services:api-infrastructure:https:0"];
+            
+            if (!string.IsNullOrWhiteSpace(apiInfraSettings))
+            {
+                client.BaseAddress = new Uri(apiInfraSettings);
+            }
         });
 
         services.AddSingleton<IAgentFactory, AgentFactory>();

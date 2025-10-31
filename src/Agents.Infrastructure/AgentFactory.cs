@@ -23,7 +23,10 @@ public class AgentFactory(IAzureStorageRepository storageRepository, IAgentDataS
       
         try
         {
-            agentConfiguration = await agentDataService.GetAgentConfiguration(Guid.NewGuid(), templateName);
+            var id = Guid.Parse("4DB8855B-CDC2-4CA3-A478-032DE4D7E707");
+            
+            
+            agentConfiguration = await agentDataService.GetAgentConfigurationAsync(id);
 
         }
         catch (Exception exception)
