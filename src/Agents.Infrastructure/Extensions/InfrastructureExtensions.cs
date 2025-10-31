@@ -1,6 +1,6 @@
-﻿using Agents.Conversation.Common;
-using Agents.Infrastructure.Common;
+﻿using Agents.Infrastructure.Common;
 using Agents.Infrastructure.Interfaces;
+using Agents.Infrastructure.Services;
 using Agents.Infrastructure.Settings;
 using Agents.Infrastructure.Storage;
 using Microsoft.Extensions.Azure;
@@ -34,6 +34,7 @@ public static  class InfrastructureExtensions
         });
 
         services.AddSingleton<IAgentFactory, AgentFactory>();
+        services.AddSingleton<IAgentDataService, AgentDataService>();
         services.AddSingleton<IAzureStorageRepository, AzureStorageRepository>();
 
         return services;
