@@ -83,5 +83,8 @@ builder.AddProject<Projects.Agents_Summarizer>("agents-summarizer").WithReferenc
     .WithEnvironment("Topics__User", userTopic);
 
 
+builder.AddProject<Projects.Api_Infrastructure>("api-infrastructure");
+
+
 var build = builder.Build();
 build.Run();
