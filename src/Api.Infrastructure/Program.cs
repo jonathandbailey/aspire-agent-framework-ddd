@@ -1,21 +1,42 @@
+using Api.Infrastructure;
+using Api.Infrastructure.Services;
+using Api.Infrastructure.Settings;
+using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Configuration;
 using ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IAzureStorageRepository, AzureStorageRepository>();
+builder.Services.AddScoped<IAgentTemplateService, AgentTemplateService>();
+
+builder.Services.Configure<List<AgentSettings>>((options) => builder.Configuration.GetSection("AgentSettings").Bind(options));
+
+builder.Services.AddAzureClients(azure =>
+{
+    azure.AddBlobServiceClient(builder.Configuration.GetConnectionString("blobs"));
+});
 
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
+app.MapApi();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
+else
+{
+    app.UseHttpsRedirection();
+}
+   
 
 app.Run();
 
