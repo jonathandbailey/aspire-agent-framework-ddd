@@ -1,8 +1,8 @@
 using Api.Infrastructure;
+using Api.Infrastructure.Interfaces;
 using Api.Infrastructure.Services;
 using Api.Infrastructure.Settings;
 using Microsoft.Extensions.Azure;
-using Microsoft.Extensions.Configuration;
 using ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +13,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IAzureStorageRepository, AzureStorageRepository>();
 builder.Services.AddScoped<IAgentTemplateService, AgentTemplateService>();
+
+builder.Services.AddHostedService<SeedService>();
 
 builder.Services.Configure<List<AgentSettings>>((options) => builder.Configuration.GetSection("AgentSettings").Bind(options));
 

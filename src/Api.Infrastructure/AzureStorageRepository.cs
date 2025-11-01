@@ -68,6 +68,31 @@ public class AzureStorageRepository(BlobServiceClient blobServiceClient, ILogger
         }
     }
 
+    public async Task CreateContainerAsync(string containerName)
+    {
+        Verify.NotNullOrWhiteSpace(containerName);
+
+        var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+        try
+        {
+            await blobContainerClient.CreateIfNotExistsAsync();
+            logger.LogInformation("Container {containerName} created or already exists", containerName);
+        }
+        catch (RequestFailedException exception)
+        {
+            logger.LogError(exception, "Failed to create container {containerName}: {errorCode}", 
+                containerName, exception.ErrorCode);
+            throw;
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "An unknown exception occurred while creating container {containerName}", 
+                containerName);
+            throw;
+        }
+    }
+
     public async Task<string> DownloadTextBlobAsync(string blobName, string containerName)
     {
         Verify.NotNullOrWhiteSpace(blobName);
