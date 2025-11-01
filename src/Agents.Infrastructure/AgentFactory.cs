@@ -17,34 +17,31 @@ public class AgentFactory(IAzureStorageRepository storageRepository, IAgentDataS
 {
     private readonly LanguageModelSettings _settings = settings.Value;
 
-    public async Task<AIAgent> CreateAgent(string templateName)
+    public async Task<AIAgent> CreateAgent(Guid id)
     {
         AgentConfigurationDto agentConfiguration;
       
         try
         {
-            var id = Guid.Parse("4DB8855B-CDC2-4CA3-A478-032DE4D7E707");
-            
-            
             agentConfiguration = await agentDataService.GetAgentConfigurationAsync(id);
-
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "Failed to load agent template : {ChatAgentTemplateName}", templateName);
+            logger.LogError(exception, "Failed to load agent template");
             throw;
         }
 
         if (string.IsNullOrWhiteSpace(agentConfiguration.Template))
         {
-            throw new InvalidOperationException($"The downloaded agent template is empty or invalid : {templateName}");
+            throw new InvalidOperationException($"The downloaded agent template is empty or invalid");
         }
 
         var factory = new KernelPromptTemplateFactory();
 
         var promptTemplate = factory.Create(new PromptTemplateConfig(agentConfiguration.Template));
 
-        var rendered = await promptTemplate.RenderAsync(kernel);
+        var kernelArguments = new KernelArguments();
+        var rendered = await promptTemplate.RenderAsync(kernel, kernelArguments);
 
         var chatClient = new AzureOpenAIClient(new Uri(_settings.EndPoint),
                 new ApiKeyCredential(

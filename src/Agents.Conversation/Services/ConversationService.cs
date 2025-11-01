@@ -48,4 +48,23 @@ public class ConversationService(ServiceBusClient serviceBusClient, IOptions<Top
 
         await _userStreamSender.SendMessageAsync(serviceBusMessage);
     }
+
+    public async Task PublishConversationTitleStream(Guid userId, string content, Guid conversationId)
+    {
+        var payload = new ConversationTitleUpdatedMessage(userId, conversationId, content);
+
+        var serializedConversation = JsonSerializer.Serialize(payload, SerializerOptions);
+
+        var serviceBusMessage = new ServiceBusMessage(serializedConversation)
+        {
+            ApplicationProperties =
+            {
+                { "Target" , "ConversationTitleStream"}
+            }
+        };
+
+        await _userStreamSender.SendMessageAsync(serviceBusMessage);
+
+        await _conversationDomainSender.SendMessageAsync(new ServiceBusMessage(serializedConversation) { Subject = "TitleUpdate" });
+    }
 }

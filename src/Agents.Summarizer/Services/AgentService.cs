@@ -53,7 +53,7 @@ public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agent
                 }
             };
 
-            await _userStreamSender.SendMessageAsync(serviceBusMessage);
+            //await _userStreamSender.SendMessageAsync(serviceBusMessage);
         }
 
         var titleUpdatedMessage = new ConversationTitleUpdatedMessage(
@@ -61,6 +61,6 @@ public class AgentService(ServiceBusClient serviceBusClient, IAgentFactory agent
 
         var serializedDomainMessage = JsonSerializer.Serialize(titleUpdatedMessage, SerializerOptions);
 
-        await _conversationDomainSender.SendMessageAsync(new ServiceBusMessage(serializedDomainMessage) { Subject = "TitleUpdate" });
+        //await _conversationDomainSender.SendMessageAsync(new ServiceBusMessage(serializedDomainMessage) { Subject = "TitleUpdate" });
     }
 }

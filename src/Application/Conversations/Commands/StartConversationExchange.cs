@@ -21,8 +21,8 @@ public class StartConversationExchangeCommandHandler(IConversationRepository con
     
         var messages = conversationDomainService.GetMessages(conversation);
 
-        await mediator.Send(new ConversationExchangeStartedIntegrationEvent(conversation.UserId, request.ExchangeId, conversation.Id,
-            messages), cancellationToken);
+        await mediator.Send(new ConversationExchangeStartedIntegrationEvent(conversation.UserId, request.ExchangeId, conversation.Id
+            , conversation.Name, messages), cancellationToken);
     }
 }
 

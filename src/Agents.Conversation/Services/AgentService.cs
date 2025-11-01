@@ -1,12 +1,10 @@
-﻿using Agents.Conversation.Common;
-using Agents.Conversation.Interfaces;
+﻿using Agents.Conversation.Interfaces;
 using Agents.Conversation.State;
 using Agents.Conversation.Workflows;
 using Agents.Infrastructure.Dto;
 using Agents.Infrastructure.Interfaces;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Agents.AI.Workflows;
-using Microsoft.Extensions.AI;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -40,22 +38,35 @@ public class AgentService(IAgentFactory agentFactory, IConversationService conve
 
     private async Task ProcessAsync(ConversationAgentMessage request)
     {
-        var agent = await agentFactory.CreateAgent(InfrastructureConstants.ConversationAgentTemplateName);
+        var conversationAgentTemplateId = Guid.Parse("4DB8855B-CDC2-4CA3-A478-032DE4D7E707");
+        var summarizerAgentTemplateId = Guid.Parse("0726538C-51CD-42BD-8500-BA4C804BD360");
+
+        var conversationAgent = await agentFactory.CreateAgent(conversationAgentTemplateId);
+        var summarizerAgent = await agentFactory.CreateAgent(summarizerAgentTemplateId);
 
         var stringBuilder = new StringBuilder();
 
         var messages = request.Messages.Map();
 
-        var conversationNode = new ConversationNode(agent);
+        var conversationNode = new ConversationNode(conversationAgent);
         var domainNode = new ConversationDomainNode(conversationService);
-        
+        var titleNode = new TitleNode(summarizerAgent, conversationService);
+
         var builder = new WorkflowBuilder(conversationNode);
 
         builder.AddEdge(conversationNode, domainNode);
+        builder.AddEdge<ConversationState>(source: conversationNode, target:titleNode, condition: arg =>
+        
+            string.IsNullOrEmpty(arg?.Title)
+        );
 
         var workflow = await builder.BuildAsync<ConversationState>();
 
-        var state = new ConversationState(messages, request.UserId, request.ConversationId, request.ExchangeId,
+        var state = new ConversationState(messages, 
+            request.UserId, 
+            request.ConversationId, 
+            request.ExchangeId, 
+            request.Title,
             string.Empty);
 
         var run = await InProcessExecution.StreamAsync(workflow, state);

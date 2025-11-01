@@ -1,10 +1,9 @@
-﻿
-using Microsoft.Agents.AI;
+﻿using Microsoft.Agents.AI;
 
 namespace Agents.Infrastructure.Interfaces;
 
 public interface IAgentFactory
 {
-    Task<AIAgent> CreateAgent(string templateName);
+    Task<AIAgent> CreateAgent(Guid id);
     Task<IAgent> CreateWrappedAgent(string templateName);
 }

@@ -19,13 +19,13 @@ public class ConversationExchangeCompletedEventHandler(IConversationRepository c
     }
 }
 
-public sealed record ConversationExchangeStartedIntegrationEvent(UserId UserId, Guid ExchangeId, Guid ConversationId, List<Message> Messages)
+public sealed record ConversationExchangeStartedIntegrationEvent(UserId UserId, Guid ExchangeId, Guid ConversationId, string Title, List<Message> Messages)
     : IRequest;
 
 public class ConversationExchangeStartedIntegrationEventHandler(IIntegrationMessaging messaging) : IRequestHandler<ConversationExchangeStartedIntegrationEvent>
 {
     public async Task Handle(ConversationExchangeStartedIntegrationEvent request, CancellationToken cancellationToken)
     {
-        await messaging.SendAsync(new ConversationExchangeStartedMessage(request.UserId.Value, request.ExchangeId, request.ConversationId, request.Messages));
+        await messaging.SendAsync(new ConversationExchangeStartedMessage(request.UserId.Value, request.ExchangeId, request.ConversationId, request.Title, request.Messages));
     }
 }
