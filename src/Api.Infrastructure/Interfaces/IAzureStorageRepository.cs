@@ -1,4 +1,4 @@
-﻿namespace Api.Infrastructure;
+﻿namespace Api.Infrastructure.Interfaces;
 
 public interface IAzureStorageRepository
 {

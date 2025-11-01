@@ -1,4 +1,5 @@
 ﻿using Api.Infrastructure.Dto;
+using Api.Infrastructure.Interfaces;
 using Api.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 

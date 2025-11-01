@@ -1,6 +1,6 @@
 ﻿using Api.Infrastructure.Dto;
 
-namespace Api.Infrastructure.Services;
+namespace Api.Infrastructure.Interfaces;
 
 public interface IAgentTemplateService
 {

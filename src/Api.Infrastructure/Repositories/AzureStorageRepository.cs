@@ -1,9 +1,10 @@
 ﻿using System.Text;
+using Api.Infrastructure.Interfaces;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 
-namespace Api.Infrastructure;
+namespace Api.Infrastructure.Repositories;
 
 public class AzureStorageRepository(BlobServiceClient blobServiceClient, ILogger<AzureStorageRepository> logger)
     : IAzureStorageRepository

@@ -1,4 +1,5 @@
 ﻿using Api.Infrastructure.Dto;
+using Api.Infrastructure.Interfaces;
 using Api.Infrastructure.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 

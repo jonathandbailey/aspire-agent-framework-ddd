@@ -1,21 +1,23 @@
-﻿namespace Api.Infrastructure.Interfaces;
+﻿using Api.Infrastructure.Interfaces;
+using Api.Infrastructure.Settings;
+using Microsoft.Extensions.Options;
 
-public class SeedService(IServiceProvider serviceProvider, IConfiguration configuration, ILogger<SeedService> logger) : IHostedService
+namespace Api.Infrastructure.Services;
+
+public class AzureStorageSeedService(
+    IServiceProvider serviceProvider,
+    IOptions<AzureStorageSeedSettings> settings,
+    ILogger<AzureStorageSeedService> logger) : IHostedService
 {
-    private const string ContainerNameKey = "SeedService:ContainerName";
-    private const string LocalFolderPathKey = "SeedService:LocalFolderPath";
-    private const string DefaultContainerName = "agent-templates";
-    private const string DefaultContentType = "application/yaml";
-
+    
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         using var scope = serviceProvider.CreateScope();
 
         var storageRepository = scope.ServiceProvider.GetRequiredService<IAzureStorageRepository>();
 
-        // Get configuration values
-        var containerName = configuration[ContainerNameKey] ?? DefaultContainerName;
-        var localFolderPath = configuration[LocalFolderPathKey];
+        var containerName = settings.Value.ContainerName;
+        var localFolderPath = settings.Value.LocalFolderPath;
 
         if (string.IsNullOrWhiteSpace(localFolderPath))
         {
@@ -23,25 +25,17 @@ public class SeedService(IServiceProvider serviceProvider, IConfiguration config
             return;
         }
 
-        // Make path absolute if it's relative - resolve from solution root
         if (!Path.IsPathRooted(localFolderPath))
         {
-            // Get the solution root by going up from the current directory
             var currentDirectory = Directory.GetCurrentDirectory();
-            var solutionRoot = GetSolutionRoot(currentDirectory);
+            var solutionRoot = GetSolutionRoot(currentDirectory, localFolderPath);
+
+            if (solutionRoot == null)
+                throw new Exception($"Folder {localFolderPath} was not found in the parent hierarchy.");
             
-            if (solutionRoot != null)
-            {
-                localFolderPath = Path.Combine(solutionRoot, localFolderPath);
-            }
-            else
-            {
-                // Fallback to current directory if solution root not found
-                localFolderPath = Path.Combine(currentDirectory, localFolderPath);
-            }
+            localFolderPath = Path.Combine(solutionRoot, localFolderPath);
         }
 
-        // Normalize the path
         localFolderPath = Path.GetFullPath(localFolderPath);
 
         if (!Directory.Exists(localFolderPath))
@@ -52,45 +46,28 @@ public class SeedService(IServiceProvider serviceProvider, IConfiguration config
 
         try
         {
-            // Check if container exists
             var containerExists = await storageRepository.ContainerExists(containerName);
 
-            // Create container if it doesn't exist
             if (!containerExists)
             {
                 logger.LogInformation("Container '{ContainerName}' does not exist. Creating it now.", containerName);
                 await storageRepository.CreateContainerAsync(containerName);
             }
-            else
-            {
-                logger.LogInformation("Container '{ContainerName}' already exists.", containerName);
-            }
-
-            // Parse all files in the local folder
+     
             var files = Directory.GetFiles(localFolderPath, "*.*", SearchOption.AllDirectories);
 
-            logger.LogInformation("Found {FileCount} files to upload from '{LocalFolderPath}'", files.Length, localFolderPath);
-
-            // Upload each file to the container (overwrite)
             foreach (var filePath in files)
             {
                 var fileName = Path.GetFileName(filePath);
                 var fileContent = await File.ReadAllTextAsync(filePath, cancellationToken);
                 var contentType = GetContentType(filePath);
 
-                logger.LogInformation("Uploading file '{FileName}' to container '{ContainerName}'", fileName, containerName);
-
                 await storageRepository.UploadTextBlobAsync(fileName, containerName, fileContent, contentType);
-
-                logger.LogInformation("Successfully uploaded '{FileName}'", fileName);
             }
-
-            logger.LogInformation("Seed data upload completed. Uploaded {FileCount} files.", files.Length);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error occurred during seed data upload to container '{ContainerName}'", containerName);
-            // Don't throw - we don't want to prevent the application from starting
         }
     }
 
@@ -99,15 +76,13 @@ public class SeedService(IServiceProvider serviceProvider, IConfiguration config
         return Task.CompletedTask;
     }
 
-    private static string? GetSolutionRoot(string startPath)
+    private static string? GetSolutionRoot(string startPath, string targetFolder)
     {
         var directory = new DirectoryInfo(startPath);
         
         while (directory != null)
         {
-            // Look for .sln file or src directory as indicators of solution root
-            if (directory.GetFiles("*.sln").Length > 0 || 
-                (directory.GetDirectories("src").Length > 0 && directory.Parent != null))
+            if ((directory.GetDirectories(targetFolder).Length > 0 && directory.Parent != null))
             {
                 return directory.FullName;
             }

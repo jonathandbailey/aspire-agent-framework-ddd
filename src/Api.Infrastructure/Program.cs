@@ -1,5 +1,6 @@
 using Api.Infrastructure;
 using Api.Infrastructure.Interfaces;
+using Api.Infrastructure.Repositories;
 using Api.Infrastructure.Services;
 using Api.Infrastructure.Settings;
 using Microsoft.Extensions.Azure;
@@ -14,9 +15,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAzureStorageRepository, AzureStorageRepository>();
 builder.Services.AddScoped<IAgentTemplateService, AgentTemplateService>();
 
-builder.Services.AddHostedService<SeedService>();
+builder.Services.AddHostedService<AzureStorageSeedService>();
 
 builder.Services.Configure<List<AgentSettings>>((options) => builder.Configuration.GetSection("AgentSettings").Bind(options));
+
+builder.Services.Configure<AzureStorageSeedSettings>((options) => builder.Configuration.GetSection("AzureStorageSeedSettings").Bind(options));
 
 builder.Services.AddAzureClients(azure =>
 {
