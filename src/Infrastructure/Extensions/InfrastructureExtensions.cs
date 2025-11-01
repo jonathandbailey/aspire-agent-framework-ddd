@@ -39,7 +39,9 @@ public static class InfrastructureExtensions
         services.AddHostedService<IntegrationMessageWorker>();
 
         services.Configure<AzureStorageSettings>((options)=> configuration.GetSection("AzureStorageSettings").Bind(options));
-      
+
+        services.Configure<QueueSettings>(configuration.GetSection("Queues"));
+
         return services;
     }
 }

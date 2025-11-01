@@ -1,13 +1,15 @@
 ﻿using Application.Interfaces;
 using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Infrastructure.Settings;
 
 namespace Infrastructure.Messaging;
 
-public class AzureMessageBus(ServiceBusClient serviceBusClient) : IIntegrationMessaging
+public class AzureMessageBus(ServiceBusClient serviceBusClient, IOptions<QueueSettings> settings) : IIntegrationMessaging
 {
-    private readonly ServiceBusSender _senderQueue = serviceBusClient.CreateSender("agent-queue");
+    private readonly ServiceBusSender _senderQueue = serviceBusClient.CreateSender(settings.Value.Agent);
   
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {

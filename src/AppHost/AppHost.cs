@@ -57,7 +57,9 @@ conversationDomainTopic.AddServiceBusSubscription("title-update-subscription")
 var blobs = builder.AddAzureBlobsServices(storage);
 
 var api = builder.AddProject<Projects.Api>(apiName).WithReference(blobs).WaitFor(storage)
-    .WithReference(serviceBus).WaitFor(topic).WaitFor(conversationDomainTopic);
+    .WithReference(serviceBus)
+    .WithEnvironment("Queues__Agent", agentQueueName)
+    .WaitFor(topic).WaitFor(conversationDomainTopic);
 
 var hub = builder.AddProject<Projects.Api_Hub>("api-hub").WithReference(serviceBus).WaitFor(topic);
 
