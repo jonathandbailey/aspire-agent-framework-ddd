@@ -26,6 +26,6 @@ public class ConversationExchangeStartedIntegrationEventHandler(IIntegrationMess
 {
     public async Task Handle(ConversationExchangeStartedIntegrationEvent request, CancellationToken cancellationToken)
     {
-        await messaging.SendAsync(new ConversationExchangeStartedMessage(request.UserId.Value, request.ExchangeId, request.ConversationId, request.Title, request.Messages));
+        await messaging.SendAgentMessageAsync(new ConversationExchangeStartedMessage(request.UserId.Value, request.ExchangeId, request.ConversationId, request.Title, request.Messages));
     }
 }

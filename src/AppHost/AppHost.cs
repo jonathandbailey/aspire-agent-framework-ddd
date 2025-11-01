@@ -13,11 +13,9 @@ var userTopic = "user-topic";
 
 var topic = serviceBus.AddServiceBusTopic(userTopic);
 
-var conversationQueue = "agent-conversation-queue";
-var agentConversationQueue = serviceBus.AddServiceBusQueue(conversationQueue);
+var agentQueueName = "agent-queue";
+var agentQueue = serviceBus.AddServiceBusQueue(agentQueueName);
 
-var summarizerQueue = "agent-summarizer-queue";
-var agentSummarizerQueue = serviceBus.AddServiceBusQueue(summarizerQueue);
 
 var domainTopic = "conversation-domain-topic";
 var conversationDomainTopic = serviceBus.AddServiceBusTopic(domainTopic);
@@ -73,9 +71,9 @@ var apiInfrastucture = builder.AddProject<Projects.Api_Infrastructure>("api-infr
 
 
 builder.AddProject<Projects.Agents_Conversation>("agents-conversation").WithReference(blobs).WaitFor(storage)
-    .WithReference(serviceBus).WaitFor(agentConversationQueue)
+    .WithReference(serviceBus).WaitFor(agentQueue)
     .WithReference(apiInfrastucture).WaitFor(apiInfrastucture)
-    .WithEnvironment("Queues__Agent", conversationQueue)
+    .WithEnvironment("Queues__Agent", agentQueueName)
     .WithEnvironment("Topics__Domain", domainTopic)
     .WithEnvironment("Topics__User", userTopic);
 
