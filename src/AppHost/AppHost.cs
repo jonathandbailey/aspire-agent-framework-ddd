@@ -1,4 +1,3 @@
-
 using AppHost.Extensions;
 using Aspire.Hosting.Azure;
 
@@ -26,7 +25,8 @@ topic.AddServiceBusSubscription("subscription")
         subscription.MaxDeliveryCount = 10;
     });
 
-conversationDomainTopic.AddServiceBusSubscription("exchange-complete-subscription")
+var exchangeCompleteSubscription = "exchange-complete-subscription";
+conversationDomainTopic.AddServiceBusSubscription(exchangeCompleteSubscription)
     .WithProperties(subscription =>
     {
         subscription.MaxDeliveryCount = 10;
@@ -40,7 +40,8 @@ conversationDomainTopic.AddServiceBusSubscription("exchange-complete-subscriptio
             });
     });
 
-conversationDomainTopic.AddServiceBusSubscription("title-update-subscription")
+var titleUpdateSubscription = "title-update-subscription";
+conversationDomainTopic.AddServiceBusSubscription(titleUpdateSubscription)
     .WithProperties(subscription =>
     {
         subscription.MaxDeliveryCount = 10;
@@ -59,6 +60,9 @@ var blobs = builder.AddAzureBlobsServices(storage);
 var api = builder.AddProject<Projects.Api>(apiName).WithReference(blobs).WaitFor(storage)
     .WithReference(serviceBus)
     .WithEnvironment("Queues__Agent", agentQueueName)
+    .WithEnvironment("Topics__Domain", domainTopic)
+    .WithEnvironment("Topics__DomainSubscriptionExchange", exchangeCompleteSubscription)
+    .WithEnvironment("Topics__DomainSubscriptionTitle", titleUpdateSubscription)
     .WaitFor(topic).WaitFor(conversationDomainTopic);
 
 var hub = builder.AddProject<Projects.Api_Hub>("api-hub").WithReference(serviceBus).WaitFor(topic);

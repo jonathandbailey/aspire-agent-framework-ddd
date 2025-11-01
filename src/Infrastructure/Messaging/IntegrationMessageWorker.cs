@@ -1,12 +1,14 @@
 ﻿using Application.Dto;
+using Application.Events.Integration;
 using Azure.Messaging.ServiceBus;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Application.Events.Integration;
-using MediatR;
+using Infrastructure.Settings;
 
 namespace Infrastructure.Messaging;
 
@@ -26,14 +28,14 @@ public class IntegrationMessageWorker : BackgroundService
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public IntegrationMessageWorker(ServiceBusClient serviceBusClient, IServiceProvider serviceProvider,
+    public IntegrationMessageWorker(ServiceBusClient serviceBusClient, IServiceProvider serviceProvider, IOptions<TopicSettings> settings,
         ILogger<IntegrationMessageWorker> logger)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
 
-        _processor = serviceBusClient.CreateProcessor("conversation-domain-topic", "exchange-complete-subscription");
-        _processorTitle = serviceBusClient.CreateProcessor("conversation-domain-topic", "title-update-subscription");
+        _processor = serviceBusClient.CreateProcessor(settings.Value.Domain, settings.Value.DomainSubscriptionExchange);
+        _processorTitle = serviceBusClient.CreateProcessor(settings.Value.Domain, settings.Value.DomainSubscriptionTitle);
         _processorTitle.ProcessMessageAsync += ProcessorTitleOnProcessMessageAsync;
         _processorTitle.ProcessErrorAsync += _processorTitle_ProcessErrorAsync;
         _processor.ProcessMessageAsync += OnMessageAsync;

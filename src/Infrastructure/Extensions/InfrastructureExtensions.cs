@@ -41,6 +41,7 @@ public static class InfrastructureExtensions
         services.Configure<AzureStorageSettings>((options)=> configuration.GetSection("AzureStorageSettings").Bind(options));
 
         services.Configure<QueueSettings>(configuration.GetSection("Queues"));
+        services.Configure<TopicSettings>(configuration.GetSection("Topics"));
 
         return services;
     }
