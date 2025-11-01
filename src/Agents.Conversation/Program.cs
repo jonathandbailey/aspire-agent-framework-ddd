@@ -1,3 +1,4 @@
+using Agents.Conversation.Extensions;
 using Agents.Conversation.Interfaces;
 using Agents.Conversation.Services;
 using Agents.Infrastructure.Extensions;

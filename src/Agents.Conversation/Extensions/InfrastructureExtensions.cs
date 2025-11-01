@@ -1,12 +1,12 @@
-﻿using Agents.Infrastructure.Common;
+﻿using Agents.Infrastructure;
+using Agents.Infrastructure.Common;
+using Agents.Infrastructure.Extensions;
 using Agents.Infrastructure.Interfaces;
 using Agents.Infrastructure.Services;
 using Agents.Infrastructure.Settings;
 using Microsoft.Extensions.Azure;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Agents.Infrastructure.Extensions;
+namespace Agents.Conversation.Extensions;
 
 public static class InfrastructureExtensions
 {
