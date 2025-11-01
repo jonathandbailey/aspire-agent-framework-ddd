@@ -2,7 +2,6 @@
 using Agents.Infrastructure.Interfaces;
 using Agents.Infrastructure.Services;
 using Agents.Infrastructure.Settings;
-using Agents.Infrastructure.Storage;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,7 +33,6 @@ public static class InfrastructureExtensions
             azure.AddBlobServiceClient(configuration.GetConnectionString(InfrastructureConstants.BlobStorageConnectionName));
         });
 
-        // Register named HttpClient for API Infrastructure with service discovery
         services.AddHttpClient(ApiInfrastructureHttpClientName, (serviceProvider, client) =>
         {
             var apiInfraSettings = configuration["services:api-infrastructure:http:0"]
@@ -48,8 +46,7 @@ public static class InfrastructureExtensions
 
         services.AddSingleton<IAgentFactory, AgentFactory>();
         services.AddSingleton<IAgentDataService, AgentDataService>();
-        services.AddSingleton<IAzureStorageRepository, AzureStorageRepository>();
-
+  
         return services;
     }
 }

@@ -5,5 +5,4 @@ namespace Agents.Infrastructure.Interfaces;
 public interface IAgentFactory
 {
     Task<AIAgent> CreateAgent(Guid id);
-    Task<IAgent> CreateWrappedAgent(string templateName);
 }
