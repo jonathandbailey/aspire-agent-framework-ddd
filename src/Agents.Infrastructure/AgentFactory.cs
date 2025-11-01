@@ -12,9 +12,27 @@ using Microsoft.Extensions.Logging;
 
 namespace Agents.Infrastructure;
 
-public class AgentFactory(IAgentDataService agentDataService, Kernel kernel, ILogger<AgentFactory> logger, IOptions<LanguageModelSettings> settings) : IAgentFactory
+public class AgentFactory(
+    IAgentDataService agentDataService, 
+    Kernel kernel, 
+    ILogger<AgentFactory> logger,
+    IOptions<List<AgentSettings>> agentSettings,
+    IOptions<LanguageModelSettings> languageModelSettings) : IAgentFactory
 {
-    private readonly LanguageModelSettings _settings = settings.Value;
+    private readonly LanguageModelSettings _settings = languageModelSettings.Value;
+    public async Task<AIAgent> CreateConversationAgent()
+    {
+        var conversationAgentTemplateId = agentSettings.Value.First(x => x.Name == "Conversation").Id;
+
+        return await CreateAgent(conversationAgentTemplateId);
+    }
+
+    public async Task<AIAgent> CreateTitleAgent()
+    {
+        var summarizerAgentTemplateId = agentSettings.Value.First(x => x.Name == "Title").Id;
+
+        return await CreateAgent(summarizerAgentTemplateId);
+    }
 
     public async Task<AIAgent> CreateAgent(Guid id)
     {

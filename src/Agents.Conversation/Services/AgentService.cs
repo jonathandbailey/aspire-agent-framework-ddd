@@ -9,7 +9,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Agents.Conversation.Extensions;
-using Agents.Infrastructure.Common;
 
 namespace Agents.Conversation.Services;
 
@@ -38,11 +37,8 @@ public class AgentService(IAgentFactory agentFactory, IConversationService conve
 
     private async Task ProcessAsync(ConversationAgentMessage request)
     {
-        var conversationAgentTemplateId = Guid.Parse("4DB8855B-CDC2-4CA3-A478-032DE4D7E707");
-        var summarizerAgentTemplateId = Guid.Parse("0726538C-51CD-42BD-8500-BA4C804BD360");
-
-        var conversationAgent = await agentFactory.CreateAgent(conversationAgentTemplateId);
-        var summarizerAgent = await agentFactory.CreateAgent(summarizerAgentTemplateId);
+        var conversationAgent = await agentFactory.CreateConversationAgent();
+        var summarizerAgent = await agentFactory.CreateTitleAgent();
 
         var stringBuilder = new StringBuilder();
 

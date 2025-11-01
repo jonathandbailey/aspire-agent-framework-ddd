@@ -17,11 +17,12 @@ public static class InfrastructureExtensions
         services.Configure<LanguageModelSettings>((options) =>
             configuration.GetSection(InfrastructureConstants.LanguageModelSettingsKey).Bind(options));
 
-        services.Configure<QueueSettings>(
-            configuration.GetSection("Queues"));
+        services.Configure<List<AgentSettings>>((options) => configuration.GetSection("AgentSettings").Bind(options));
 
-        services.Configure<TopicSettings>(
-            configuration.GetSection("Topics"));
+
+        services.Configure<QueueSettings>(configuration.GetSection("Queues"));
+
+        services.Configure<TopicSettings>(configuration.GetSection("Topics"));
 
         var modelSettings = configuration.GetRequiredSetting<LanguageModelSettings>(InfrastructureConstants.LanguageModelSettingsKey);
 
