@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Agents.Conversation\Agents.Conversation.csproj" />
-    <ProjectReference Include="..\Agents.Summarizer\Agents.Summarizer.csproj" />
     <ProjectReference Include="..\Api.Hub\Api.Hub.csproj" />
     <ProjectReference Include="..\Api.Infrastructure\Api.Infrastructure.csproj" />
     <ProjectReference Include="..\Api\Api.csproj" />
