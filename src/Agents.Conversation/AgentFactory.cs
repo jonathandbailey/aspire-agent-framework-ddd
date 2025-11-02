@@ -27,6 +27,13 @@ public class AgentFactory(
         return await CreateAgent(conversationAgentTemplateId);
     }
 
+    public async Task<AIAgent> CreateConversationReasonAgent()
+    {
+        var conversationAgentTemplateId = agentSettings.Value.First(x => x.Name == "Conversation-Reason").Id;
+
+        return await CreateAgent(conversationAgentTemplateId);
+    }
+
     public async Task<AIAgent> CreateTitleAgent()
     {
         var summarizerAgentTemplateId = agentSettings.Value.First(x => x.Name == "Title").Id;
